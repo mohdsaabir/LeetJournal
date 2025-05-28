@@ -1,0 +1,41 @@
+Problem Statement:
+
+So the main issue is that whenever I solves a Leetcode problem there is no any organized way to store the code or the way how I reached the code. Currently what I am doing is that I solves the question and then copy paste the solution to textpad along with the question number only but there is no organized way. Also I am not consistently saving the answer also sometimes I misses to save the solution and also at the revision time there is organized way to revise as well. since most of the part is code it is not that comfortable to write code in paper and it is time consuming as well. 
+
+Major aim:
+
+* Is to give a personalized and an mental attachment to the user that's what the name Journal also focuses 
+* As it is a personal project trying to solve my problem the initially planning to only develop only an mvp and later if it is useful I 
+  will upscale it
+
+
+Solution:
+
+So what I am planning is to make a webapp in which I can save my solution and also code so that I can easily revise it whenever needed.
+
+Features:
+
+* Two code saving section one to save the my own solution and the other part to save the optimized solution
+
+* A note part to save how  I reached the solution it will also have a provision to save images since for particular graph/tree questions pictorial representation is better.
+
+* Should have a provision to see the questions that are solved and also to mark some as favourite and also the ones needed to be marked for revision
+
+
+
+Major huddle:
+
+* To fetch and display the questions:
+  It is a major problem as we want to either copy paste the question manually which is repetative or should be able to fetch the data       based on the question url or question number
+
+
+
+Stacks to be used:
+
+* frontend: html, css, bootstrap and javascript
+* backend: Django
+* Database: yet to be sorted
+
+
+
+
