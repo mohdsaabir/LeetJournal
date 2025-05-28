@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 import json
@@ -131,11 +131,37 @@ def home_view(request):
 
 
 
-def question_detail_view(request, pk):
-    question = get_object_or_404(Question, pk=pk)
-    # You can later pass code snippets, optimized code, and notes here too
-    return render(request, "journal/question_detail.html", {"question": question})
 
+def question_detail(request, pk):
+    user = User.objects.get(username='testuser')
+    user_problem = get_object_or_404(UserProblem, pk=pk, user=user)
+
+    if request.method == 'POST':
+        user_problem.my_solution = request.POST.get('my_solution', '')
+        user_problem.optimized_solution = request.POST.get('optimized_solution', '')
+        user_problem.note = request.POST.get('note', '')
+
+        # Save revision checkbox: present in POST only if checked
+        user_problem.mark_for_revision = 'revision' in request.POST
+
+        if 'delete_note_image' in request.POST:
+            if user_problem.note_image:
+                user_problem.note_image.delete(save=False)
+                user_problem.note_image = None
+
+        # ✅ Handle new image upload (after deletion check)
+        if 'note_image' in request.FILES:
+            user_problem.note_image = request.FILES['note_image']
+
+        # Save user difficulty from dropdown
+        user_problem.user_difficulty = request.POST.get('user_difficulty', '')
+
+        user_problem.save()
+        return redirect('question_detail', pk=pk)  # redirect to same page to prevent resubmission
+
+    return render(request, 'question_detail.html', {
+        'user_problem': user_problem
+    })
 
 
 def all_solved_view(request):

@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+{% block title %} Question Detail | LeetJournal{% endblock %}
+{% block content %}
+
+<div class="max-w-4xl mx-auto bg-white shadow-md rounded-xl p-6">
+    <h1 class="text-2xl font-bold text-blue-600 mb-4">
+        #{{ user_problem.question.question_no }} - {{ user_problem.question.title }}
+    </h1>
+    <p class="text-sm text-gray-500 mb-2">
+        Difficulty: <span class="font-semibold">{{ user_problem.question.leetcode_difficulty }}</span>
+    </p>
+    <a href="{{ user_problem.question.link }}" target="_blank" class="text-blue-500 underline mb-6 inline-block">
+        View on LeetCode
+    </a>
+
+    <h2 class="text-lg font-semibold mt-6 mb-2">Problem Statement</h2>
+    <div class="prose max-w-none bg-gray-50 p-4 rounded" style="overflow-x: auto;">
+        {{ user_problem.question.problem_statement_html|safe }}
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" class="mt-8 space-y-6" id="problem-form">
+        {% csrf_token %}
+
+        <div>
+            <label class="block font-semibold mb-1">My Solution</label>
+            <textarea name="my_solution" rows="10"
+                class="w-full p-3 border rounded-md bg-gray-50">{{ user_problem.my_solution }}</textarea>
+        </div>
+
+        <div>
+            <label class="block font-semibold mb-1">Optimized Solution</label>
+            <textarea name="optimized_solution" rows="10"
+                class="w-full p-3 border rounded-md bg-gray-50">{{ user_problem.optimized_solution }}</textarea>
+        </div>
+
+        <div>
+            <label class="block font-semibold mb-1">Notes</label>
+            <textarea name="note" rows="5"
+                class="w-full p-3 border rounded-md bg-gray-50">{{ user_problem.note }}</textarea>
+        </div>
+
+        <!-- Note Image Handling -->
+        <div>
+            <label class="block font-semibold mb-1">Note Image</label>
+            <div id="image-preview-wrapper" class="mb-4">
+                {% if user_problem.note_image %}
+                    <div class="relative inline-block" id="current-image-wrapper">
+                        <button type="button" id="delete-image-btn"
+                            class="absolute top-1 right-1 text-red-600 hover:text-red-800 transition"
+                            title="Delete Image" aria-label="Delete Image"
+                            style="font-size: 1.5rem; line-height: 1; cursor: pointer;">
+                            ×
+                        </button>
+
+                        <img id="note-image" src="{{ user_problem.note_image.url }}" alt="Note Image"
+                            class="w-64 rounded border mb-0 cursor-pointer" title="Click to zoom">
+                    </div>
+                {% else %}
+                    <p class="text-sm text-gray-500">No image uploaded yet.</p>
+                {% endif %}
+
+                <div id="new-image-preview" class="hidden">
+                    <div class="relative inline-block">
+                        <button type="button" id="delete-new-image-btn"
+                            class="absolute top-1 right-1 text-red-600 hover:text-red-800 transition"
+                            title="Delete New Image" aria-label="Delete New Image"
+                            style="font-size: 1.5rem; line-height: 1; cursor: pointer;">
+                            ×
+                        </button>
+                        <p class="font-semibold mb-1">New Image Preview:</p>
+                        <img id="preview-img" src="#" alt="New Note Image Preview" class="w-64 rounded border mb-0 cursor-pointer">
+                    </div>
+                </div>
+            </div>
+
+            <input type="file" name="note_image" accept="image/*" id="note-image-input"
+                class="block w-full text-sm text-gray-700 border border-gray-300 rounded-md cursor-pointer bg-gray-50 p-2">
+        </div>
+
+        
+
+        <!-- User Difficulty dropdown -->
+        <div>
+            <label class="block font-semibold mb-1">User Difficulty</label>
+            <select name="user_difficulty" class="w-full p-3 border rounded-md bg-gray-50">
+                <option value="Easy" {% if user_problem.user_difficulty == "Easy" %}selected{% endif %}>Easy</option>
+                <option value="Medium" {% if user_problem.user_difficulty == "Medium" %}selected{% endif %}>Medium</option>
+                <option value="Hard" {% if user_problem.user_difficulty == "Hard" %}selected{% endif %}>Hard</option>
+            </select>
+        </div>
+
+        <!-- Revision status and toggle -->
+        <div class="mt-4">
+            <div class="flex items-center space-x-2">
+                <input type="checkbox" id="revision" name="revision" value="True"
+                    {% if user_problem.mark_for_revision %}checked{% endif %}
+                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <label for="revision" id="revision-label" class="font-semibold text-gray-800">
+                    To be Revised
+                </label>
+            </div>
+        </div>
+
+        <button type="submit"
+            class="bg-blue-600 text-white font-semibold px-6 py-2 rounded hover:bg-blue-700 transition">
+            Save Changes
+        </button>
+
+       
+    </form>
+
+    </div>
+
+    <!-- Move the Zoom Modal here, outside the main content div -->
+    <div id="zoom-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden">
+        <div class="relative">
+            <button id="zoom-close" class="absolute top-2 right-2 text-white hover:text-gray-300 text-3xl font-bold focus:outline-none transition" title="Close">&times;</button>
+            <img id="zoomed-img" src="" alt="Zoomed Note Image" class="max-h-[80vh] max-w-[90vw] rounded shadow-lg border-4 border-white">
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const noteImage = document.getElementById("note-image");
+    const previewImg = document.getElementById("preview-img");
+    const deleteBtn = document.getElementById("delete-image-btn");
+    const form = document.getElementById("problem-form");
+    const fileInput = document.getElementById("note-image-input");
+    const newImagePreview = document.getElementById("new-image-preview");
+    const currentImageWrapper = document.getElementById("current-image-wrapper");
+    const imagePreviewWrapper = document.getElementById("image-preview-wrapper");
+    const deleteNewImageBtn = document.getElementById("delete-new-image-btn");
+
+   
+
+    if (deleteBtn) {
+        deleteBtn.addEventListener("click", function () {
+            if (currentImageWrapper) currentImageWrapper.style.display = 'none';
+            if (imagePreviewWrapper) {
+                if (newImagePreview.classList.contains("hidden")) {
+                    imagePreviewWrapper.querySelector('p')?.classList.remove("hidden");
+                }
+            }
+            fileInput.value = '';
+            if (!form.querySelector('input[name="delete_note_image"]')) {
+                let input = document.createElement("input");
+                input.type = "hidden";
+                input.name = "delete_note_image";
+                input.value = "true";
+                form.appendChild(input);
+            }
+            newImagePreview.classList.add("hidden");
+        });
+    }
+
+    if (deleteNewImageBtn) {
+        deleteNewImageBtn.addEventListener("click", function () {
+            fileInput.value = '';
+            newImagePreview.classList.add("hidden");
+            if (currentImageWrapper) currentImageWrapper.style.display = '';
+            // If no DB image, show the "No image uploaded yet." message
+            if (!currentImageWrapper && imagePreviewWrapper) {
+                imagePreviewWrapper.querySelector('p')?.classList.remove("hidden");
+            }
+        });
+    }
+
+    fileInput.addEventListener("change", function (event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                previewImg.src = e.target.result;
+                newImagePreview.classList.remove("hidden");
+                if (currentImageWrapper) currentImageWrapper.style.display = 'none';
+                imagePreviewWrapper.querySelectorAll('p').forEach(p => p.classList.add("hidden"));
+            };
+            reader.readAsDataURL(file);
+
+            const deleteInput = form.querySelector('input[name="delete_note_image"]');
+            if (deleteInput) deleteInput.remove();
+        } else {
+            newImagePreview.classList.add("hidden");
+            if (currentImageWrapper) currentImageWrapper.style.display = '';
+            if (!currentImageWrapper) {
+                imagePreviewWrapper.querySelector('p')?.classList.remove("hidden");
+            }
+        }
+    });
+
+    // --- Zoom functionality ---
+    const zoomModal = document.getElementById("zoom-modal");
+    const zoomedImg = document.getElementById("zoomed-img");
+    const zoomClose = document.getElementById("zoom-close");
+
+    // Helper to open modal with given src
+    function openZoomModal(src) {
+        zoomedImg.src = src;
+        zoomModal.classList.remove("hidden");
+    }
+
+    // Click on current image to zoom
+    if (noteImage) {
+        noteImage.addEventListener("click", function () {
+            openZoomModal(noteImage.src);
+        });
+    }
+
+    // Click on new preview image to zoom
+    if (previewImg) {
+        previewImg.addEventListener("click", function () {
+            if (previewImg.src && !previewImg.classList.contains("hidden")) {
+                openZoomModal(previewImg.src);
+            }
+        });
+    }
+
+    // Close modal on close button
+    if (zoomClose) {
+        zoomClose.addEventListener("click", function () {
+            zoomModal.classList.add("hidden");
+            zoomedImg.src = "";
+        });
+    }
+
+    // Close modal when clicking outside the image
+    if (zoomModal) {
+        zoomModal.addEventListener("click", function (e) {
+            if (e.target === zoomModal) {
+                zoomModal.classList.add("hidden");
+                zoomedImg.src = "";
+            }
+        });
+    }
+});
+</script>
+
+
+{% endblock %}
