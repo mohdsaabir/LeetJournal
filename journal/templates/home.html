@@ -20,6 +20,13 @@
         <input type="text" name="q" placeholder="Search your journal..."
             class="w-full max-w-lg border rounded-full px-6 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
     </form>
+    <form action="{% url 'new_entry' %}" method="get" class="max-w-lg mx-auto mb-10 flex">
+        <input type="url" name="url" placeholder="Paste LeetCode URL to add new entry..." required
+            class="flex-grow border rounded-l-full px-6 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+        <button type="submit"
+            class="bg-gray-600 hover:bg-gray-900 text-white font-bold rounded-r-full px-6 transition-colors duration-300"
+            aria-label="Add new entry">+  </button>
+    </form>
 
     <!-- Recently Solved -->
     <div class="text-left max-w-2xl mx-auto">
