@@ -165,5 +165,9 @@ def question_detail(request, pk):
 
 
 def all_solved_view(request):
-    questions = Question.objects.all()  # or filter by solved status if you have it
-    return render(request, "journal/all_solved.html", {"questions": questions})
+
+    user= User.objects.get(username='testuser')
+
+    questions_solved = UserProblem.objects.filter(user=user).order_by('-last_solved')  
+    print(questions_solved)
+    return render(request, "all_solved.html", {"solved_problems": questions_solved})
