@@ -6,6 +6,8 @@ import re
 import requests
 from .models import Question, Tag, DIFFICULTY_CHOICES, UserProblem
 from django.contrib.auth.models import User
+from django.http import JsonResponse
+from datetime import date
 
 
 
@@ -175,4 +177,67 @@ def all_solved_view(request):
 
 
 def new_entry_view(request):
-    pass
+    user = User.objects.get(username='testuser')
+
+    if request.method == 'POST':
+        url = request.POST.get('url', '').strip()
+        if url:
+            slug = extract_slug(url)
+
+            if not slug:
+                return JsonResponse({"status": "error", "message": "Invalid URL"}, status=400)
+
+            try:
+                qdata = fetch_leetcode_data(slug)
+                if not qdata:
+                    return JsonResponse({
+                        "status": "error",
+                        "message": "Question data could not be fetched. Please check the URL."
+                    }, status=400)
+            except Exception as e:
+                    return JsonResponse({
+                        "status": "error",
+                        "message": f"Failed to fetch data: {str(e)}"
+                    }, status=500)
+
+
+            question_no = int(qdata["questionFrontendId"])
+            difficulty = qdata["difficulty"]
+
+            question, created = Question.objects.get_or_create(
+                question_no=question_no,
+                defaults={
+                    "title": qdata["title"],
+                    "link": f"https://leetcode.com/problems/{slug}/",
+                    "leetcode_difficulty": difficulty,
+                    "problem_statement_html": qdata["content"],
+                },
+            )
+            if not created:
+                question.title = qdata["title"]
+                question.leetcode_difficulty = difficulty
+                question.link = f"https://leetcode.com/problems/{slug}/"
+                question.problem_statement_html = qdata["content"]
+                question.save()
+
+            tag_names = [tag["name"] for tag in qdata["tags"]]
+            question.tags.clear()
+            for name in tag_names:
+                tag, _ = Tag.objects.get_or_create(name=name)
+                question.tags.add(tag)
+
+            user_problem, _ = UserProblem.objects.get_or_create(
+                user=user,
+                question=question,
+                defaults={"last_solved": date.today(), "mark_for_revision": False}
+            )
+
+            return JsonResponse({
+                "status": "success",
+                "message": "Question added successfully!",
+                "redirect_url": f"/question/{user_problem.pk}/"  # or use reverse()
+            })
+
+        return JsonResponse({"status": "error", "message": "No URL provided"}, status=400)
+
+    return render(request, "home.html", {"user": user})

@@ -30,7 +30,7 @@
         <div>
             <label class="block font-semibold mb-1">Optimized Solution</label>
             <textarea name="optimized_solution" rows="10"
-                class="w-full p-3 border rounded-md bg-gray-50">{{ user_problem.optimized_solution }}</textarea>
+                class="w-full p-3 border rounded-md bg-gray-50">{{ user_problem.optimized_solution|default_if_none:'' }}</textarea>
         </div>
 
         <div>

@@ -1,20 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}LeetJournal 📓{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-[#fffdf7] text-gray-800 font-sans min-h-screen flex flex-col">
 
     <!-- Navbar -->
     <header class="bg-[#f5f3eb] shadow p-4">
         <div class="container mx-auto flex justify-between items-center">
             <h1 class="text-2xl font-bold">LeetJournal 📓</h1>
-            <nav>
-                <a href="/" class="text-gray-700 hover:underline mx-2">Home</a>
-                <a href="/search/" class="text-gray-700 hover:underline mx-2">Search</a>
+
+            <!-- Hamburger button - hidden on md and up -->
+            <button id="menu-btn" class="md:hidden focus:outline-none" aria-label="Toggle menu">
+                <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                    <path d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+
+            <!-- Desktop Nav -->
+            <nav class="hidden md:flex space-x-4">
+                <a href="/" class="text-gray-700 hover:underline">Home</a>
+                <a href="/search/" class="text-gray-700 hover:underline">Search</a>
             </nav>
+        </div>
+
+        <!-- Mobile Dropdown -->
+        <div id="mobile-menu" class="md:hidden hidden mt-2 px-4">
+            <a href="/" class="block py-1 text-gray-700 hover:underline">Home</a>
+            <a href="/search/" class="block py-1 text-gray-700 hover:underline">Search</a>
         </div>
     </header>
 
@@ -28,5 +46,15 @@
         <p class="text-sm text-gray-500">© 2025 LeetJournal</p>
     </footer>
 
+    <!-- Script -->
+    <script>
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+    </script>
 </body>
+
 </html>
