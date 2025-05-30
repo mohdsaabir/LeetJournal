@@ -5,7 +5,7 @@
 
     <!-- Stats Section -->
     <div class="grid grid-cols-2 gap-6 mb-10 max-w-md mx-auto">
-        <div onClick="window.location.href='/solved/'" style="cursor:pointer;"  class="bg-white shadow rounded-xl p-6">
+        <div onClick="window.location.href='/solved/'" style="cursor:pointer;" class="bg-white shadow rounded-xl p-6">
             <p class="text-xl font-bold text-green-600">{{ total_solved }}</p>
             <p class="text-gray-600">Solved Problems</p>
         </div>
@@ -17,54 +17,62 @@
 
     <!-- Search -->
     <form action="/search/" method="get" class="mb-10">
-        <input type="text" name="q" placeholder="Search your journal..."
-            class="w-full max-w-lg border rounded-full px-6 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-    </form>
-
-    <!-- Floating Alert Box -->
-    <div id="alert-box" class="fixed top-5 right-5 z-50"></div>
-
-    <!-- URL Form -->
-    <form id="leetcode-form" class="max-w-lg mx-auto mb-10 flex">
-        {% csrf_token %}
-        <input type="url" id="leetcode-url" name="url" placeholder="Paste LeetCode URL to add new entry..." required
-            class="flex-grow border rounded-l-full px-6 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" autocomplete="off"/>
-        <button type="submit"
-            class="bg-gray-600 hover:bg-gray-900 text-white font-bold rounded-r-full px-6 transition-colors duration-300"
-            aria-label="Add new entry">+</button>
-    </form>
-
-    <!-- Calendar and Recently Solved Layout -->
-    <div class="flex flex-col lg:flex-row justify-center items-start gap-10">
-
-        <!-- 📅 Calendar Section -->
-        <div class="bg-[#fefae0] rounded-2xl shadow-lg p-6 w-80" id="calendar-container">
-            <input id="calendar" type="text" readonly
-                class="w-full cursor-pointer text-center text-gray-700 font-semibold" />
-        </div>
-
-        <!-- 🕒 Recently Solved -->
-        <div class="text-left max-w-2xl w-full">
-            <h3 class="text-2xl font-semibold mb-4" id="recent-title">🕒 Recently Solved</h3>
-            <ul id="recent-list" class="space-y-3">
-                {% for q in recent_questions %}
-                <li class="bg-white shadow rounded-xl p-4 hover:shadow-md transition">
-                    <a href="{% url 'question_detail' q.id %}"
-                        class="font-semibold text-lg text-blue-600 hover:underline">
-                        {{ q.question.question_no }} - {{ q.question.title }}
-                    </a>
-                    <p class="text-sm text-gray-500">Solved on {{ q.last_solved|date:"Y-m-d" }}</p>
-                </li>
-                {% empty %}
-                <li>No recent entries yet.</li>
-                {% endfor %}
-            </ul>
-            <div class="mt-4 text-right">
-                <a href="{% url 'all_solved' %}" id="view-all-link" class="text-blue-600 hover:underline">View All →</a>
+        <div class="relative w-full max-w-xl mx-auto">
+            <input id='search-bar' type="text" name="q" placeholder="Search your journal..."
+                class="w-full max-w-lg border rounded-full px-6 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                autocomplete="off" />
+            <div id="search-results"
+                 class="hidden absolute z-50 mt-2 w-[90%] max-h-64 overflow-y-auto bg-white border border-gray-200 rounded-2xl shadow-lg left-1/2 transform -translate-x-1/2">
+                <!-- Search results appear here -->
             </div>
         </div>
+</div>
+</form>
 
+<!-- Floating Alert Box -->
+<div id="alert-box" class="fixed top-5 right-5 z-50"></div>
+
+<!-- URL Form -->
+<form id="leetcode-form" class="max-w-lg mx-auto mb-10 flex">
+    {% csrf_token %}
+    <input type="url" id="leetcode-url" name="url" placeholder="Paste LeetCode URL to add new entry..." required
+        class="flex-grow border rounded-l-full px-6 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+        autocomplete="off" />
+    <button type="submit"
+        class="bg-gray-600 hover:bg-gray-900 text-white font-bold rounded-r-full px-6 transition-colors duration-300"
+        aria-label="Add new entry">+</button>
+</form>
+
+<!-- Calendar and Recently Solved Layout -->
+<div class="flex flex-col lg:flex-row justify-center items-start gap-10">
+
+    <!-- 📅 Calendar Section -->
+    <div class="bg-[#fefae0] rounded-2xl shadow-lg p-6 w-80" id="calendar-container">
+        <input id="calendar" type="text" readonly
+            class="w-full cursor-pointer text-center text-gray-700 font-semibold" />
     </div>
+
+    <!-- 🕒 Recently Solved -->
+    <div class="text-left max-w-2xl w-full">
+        <h3 class="text-2xl font-semibold mb-4" id="recent-title">🕒 Recently Solved</h3>
+        <ul id="recent-list" class="space-y-3">
+            {% for q in recent_questions %}
+            <li class="bg-white shadow rounded-xl p-4 hover:shadow-md transition">
+                <a href="{% url 'question_detail' q.id %}" class="font-semibold text-lg text-blue-600 hover:underline">
+                    {{ q.question.question_no }} - {{ q.question.title }}
+                </a>
+                <p class="text-sm text-gray-500">Solved on {{ q.last_solved|date:"Y-m-d" }}</p>
+            </li>
+            {% empty %}
+            <li>No recent entries yet.</li>
+            {% endfor %}
+        </ul>
+        <div class="mt-4 text-right">
+            <a href="{% url 'all_solved' %}" id="view-all-link" class="text-blue-600 hover:underline">View All →</a>
+        </div>
+    </div>
+
+</div>
 
 </div>
 
@@ -199,6 +207,29 @@
     .flatpickr-weekday {
         color: #a58e72;
         font-weight: bold;
+    }
+
+
+
+
+
+    .dropdown-results {
+        position: absolute;
+        background: white;
+        border: 1px solid #ccc;
+        z-index: 100;
+        width: 100%;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .result-item {
+        padding: 8px;
+        cursor: pointer;
+    }
+
+    .result-item:hover {
+        background: #f0f0f0;
     }
 </style>
 
@@ -363,6 +394,64 @@
                 }
             }
         });
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchBar = document.getElementById("search-bar");
+        const searchResults = document.getElementById("search-results");
+        let timeout = null;
+
+        searchBar.addEventListener("input", function () {
+            const query = this.value.trim();
+
+            clearTimeout(timeout);
+            if (query.length === 0) {
+                searchResults.innerHTML = "";
+                searchResults.classList.add("hidden");
+                return;
+            }
+
+            timeout = setTimeout(() => {
+                fetch(`/search/?q=${encodeURIComponent(query)}&ajax=1`)
+                    .then(res => res.json())
+                    .then(data => {
+                        searchResults.innerHTML = "";
+
+                        if (data.results.length === 0) {
+                            searchResults.innerHTML = "<div class='px-4 py-2 text-gray-500'>No results found</div>";
+                        } else {
+                            data.results.forEach(item => {
+                                const div = document.createElement("div");
+                                div.className = "px-4 py-2 hover:bg-gray-100 cursor-pointer";
+                                div.textContent = `${item.question_no} - ${item.title}`;
+                                div.onclick = () => {
+                                    window.location.href = `/question/${item.id}/`;
+                                };
+                                searchResults.appendChild(div);
+                            });
+                        }
+
+                        searchResults.classList.remove("hidden");
+                    });
+            }, 300);
+        });
+
+        document.addEventListener("click", function (e) {
+            if (!searchBar.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.classList.add("hidden");
+            }
+        });
+    });
+
+
+    const searchInput = document.getElementById('search-bar');
+
+    searchInput.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();  // Prevent form submission or page navigation
+        }
     });
 </script>
 

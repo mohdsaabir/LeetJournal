@@ -317,3 +317,40 @@ def revision_question(request):
 
 
 
+def live_search(request):
+    user = User.objects.get(username='testuser')  # Replace with actual user retrieval logic
+    query = request.GET.get("q", "").strip()
+    if request.GET.get("ajax") == "1":
+        if query:
+            # Try to interpret query as int for question_no
+            try:
+                query_int = int(query)
+            except ValueError:
+                query_int = None
+
+            # Step 1: Get matching Question IDs by title or question_no
+            q_filter = Q(title__icontains=query)
+            if query_int is not None:
+                q_filter |= Q(question_no=query_int)
+
+            matching_questions = Question.objects.filter(q_filter)
+            matching_ids = matching_questions.values_list('id', flat=True)
+
+            # Step 2: Filter UserProblem for this user and those questions
+            user_problems = UserProblem.objects.filter(
+                user=user,
+                question_id__in=matching_ids
+            ).select_related('question')[:5]
+
+            # Step 3: Format results
+            results = [{
+                "id": up.id,
+                "title": up.question.title,
+                "question_no": up.question.question_no,
+            } for up in user_problems]
+
+            return JsonResponse({"results": results})
+
+        return JsonResponse({"results": []})
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
