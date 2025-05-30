@@ -9,5 +9,6 @@ urlpatterns = [
     path("solved/", views.all_solved_view, name="all_solved"),
     path("new/", views.new_entry_view, name="new_entry"),
     path('calendar-dates/', views.calendar_dates, name='calendar_dates'),
+    path('calendar-data/', views.calendar_data, name='calendar_data'),
 
 ]

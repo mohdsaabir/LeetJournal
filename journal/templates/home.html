@@ -38,17 +38,14 @@
     <div class="flex flex-col lg:flex-row justify-center items-start gap-10">
 
         <!-- 📅 Calendar Section -->
-        <div class="bg-[#fefae0] rounded-2xl shadow-lg p-6 w-80">
+        <div class="bg-[#fefae0] rounded-2xl shadow-lg p-6 w-80" id="calendar-container">
             <input id="calendar" type="text" readonly
                 class="w-full cursor-pointer text-center text-gray-700 font-semibold" />
-            <button id="reset-view" class="text-sm text-indigo-600 hover:underline hidden mt-2">Show Recent
-                Entries</button>
-            <ul id="calendar-entries" class="space-y-3 hidden"></ul>
         </div>
 
         <!-- 🕒 Recently Solved -->
         <div class="text-left max-w-2xl w-full">
-            <h3 class="text-2xl font-semibold mb-4">🕒 Recently Solved</h3>
+            <h3 class="text-2xl font-semibold mb-4" id="recent-title">🕒 Recently Solved</h3>
             <ul id="recent-list" class="space-y-3">
                 {% for q in recent_questions %}
                 <li class="bg-white shadow rounded-xl p-4 hover:shadow-md transition">
@@ -63,7 +60,7 @@
                 {% endfor %}
             </ul>
             <div class="mt-4 text-right">
-                <a href="{% url 'all_solved' %}" class="text-indigo-600 hover:underline">View All →</a>
+                <a href="{% url 'all_solved' %}" id="view-all-link" class="text-blue-600 hover:underline">View All →</a>
             </div>
         </div>
 
@@ -71,7 +68,8 @@
 
 </div>
 
-<!-- JavaScript to handle form and alert -->
+
+
 <style>
     @keyframes slideFadeIn {
         0% {
@@ -206,6 +204,9 @@
 
 
 
+
+
+<!-- JS for form submission (unchanged) -->
 <script>
     document.getElementById("leetcode-form").addEventListener("submit", async function (e) {
         e.preventDefault();
@@ -246,7 +247,6 @@
             document.getElementById("leetcode-url").value = "";
             document.getElementById("leetcode-url").focus();
 
-            // Auto-dismiss after 4 seconds with fade
             setTimeout(() => {
                 alert.style.transition = "opacity 0.4s ease";
                 alert.style.opacity = "0";
@@ -258,31 +258,44 @@
     });
 </script>
 
-<!-- Flatpickr & Script -->
+<!-- Flatpickr & Fonts -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-
 <link href="https://fonts.googleapis.com/css2?family=Quicksand&display=swap" rel="stylesheet">
-
-
-
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
+        const recentList = document.getElementById("recent-list");
+        const recentTitle = document.getElementById("recent-title");
+        const originalRecentHTML = recentList.innerHTML;
+        const originalRecentTitle = recentTitle.textContent;
+
+        let markedDates = [];
+
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        const todayStr = `${yyyy}-${mm}-${dd}`;
+
         const calendar = flatpickr("#calendar", {
-            inline: true,  // <-- Added inline: true to show expanded calendar
+            inline: true,
+            defaultDate: todayStr,
+            maxDate: todayStr, // <-- This disables all future dates
             onChange: function (selectedDates, dateStr) {
                 fetch(`/calendar-data/?date=${dateStr}`)
                     .then(res => res.json())
                     .then(data => {
-                        document.getElementById("recent-list").style.display = "none";
-                        const entries = document.getElementById("calendar-entries");
-                        entries.innerHTML = "";
-
+                        recentTitle.textContent = `Solved on ${dateStr}`;
+                        const viewAllLink = document.getElementById("view-all-link");
                         if (data.questions.length === 0) {
-                            entries.innerHTML = `<li class="text-gray-500">No entries for ${dateStr}</li>`;
+                            recentList.innerHTML = `<li class="text-gray-500">No entries for ${dateStr}</li>`;
+                            if (viewAllLink) viewAllLink.style.display = "none";
                         } else {
-                            data.questions.forEach(q => {
+                            recentList.innerHTML = "";
+                            // Show only the last 3 questions (most recent)
+                            const lastThree = data.questions.slice(-3).reverse();
+                            lastThree.forEach(q => {
                                 const li = document.createElement("li");
                                 li.className = "bg-white shadow rounded-xl p-4 hover:shadow-md transition";
                                 li.innerHTML = `
@@ -291,76 +304,25 @@
                                     </a>
                                     <p class="text-sm text-gray-500">Solved on ${q.date}</p>
                                 `;
-                                entries.appendChild(li);
+                                recentList.appendChild(li);
                             });
+                            // Show "View All" link only if there are more than 3 questions
+                            if (viewAllLink) {
+                                if (data.questions.length > 3) {
+                                    viewAllLink.style.display = "";
+                                    viewAllLink.href = `/solved/?date=${dateStr}`;
+                                } else {
+                                    viewAllLink.style.display = "none";
+                                }
+                            }
                         }
-
-                        entries.classList.remove("hidden");
-                        document.getElementById("reset-view").classList.remove("hidden");
-                    });
-            }
-        });
-
-        // Click outside to reset view
-        document.addEventListener("click", (e) => {
-            if (!document.getElementById("calendar").contains(e.target)) {
-                document.getElementById("recent-list").style.display = "block";
-                document.getElementById("calendar-entries").classList.add("hidden");
-                document.getElementById("reset-view").classList.add("hidden");
-            }
-        });
-
-        // Manual reset button
-        document.getElementById("reset-view").addEventListener("click", () => {
-            document.getElementById("recent-list").style.display = "block";
-            document.getElementById("calendar-entries").classList.add("hidden");
-            document.getElementById("reset-view").classList.add("hidden");
-        });
-    });
-
-
-    document.addEventListener("DOMContentLoaded", () => {
-        let markedDates = [];
-
-        // Fetch dates with entries
-        fetch("/calendar-dates/")
-            .then(res => res.json())
-            .then(data => {
-                markedDates = data.dates || [];
-                calendar.redraw();  // to trigger day creation
-            });
-
-        const calendar = flatpickr("#calendar", {
-            inline: true,
-            onChange: function (selectedDates, dateStr) {
-                fetch(`/calendar-data/?date=${dateStr}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        document.getElementById("recent-list").style.display = "none";
-                        const entries = document.getElementById("calendar-entries");
-                        entries.innerHTML = "";
-
-                        if (data.questions.length === 0) {
-                            entries.innerHTML = `<li class="text-gray-500">No entries for ${dateStr}</li>`;
-                        } else {
-                            data.questions.forEach(q => {
-                                const li = document.createElement("li");
-                                li.className = "bg-white shadow rounded-xl p-4 hover:shadow-md transition";
-                                li.innerHTML = `
-                                <a href="/question/${q.id}/" class="font-semibold text-lg text-blue-600 hover:underline">
-                                    ${q.question_no} - ${q.title}
-                                </a>
-                                <p class="text-sm text-gray-500">Solved on ${q.date}</p>
-                            `;
-                                entries.appendChild(li);
-                            });
-                        }
-
-                        entries.classList.remove("hidden");
-                        document.getElementById("reset-view").classList.remove("hidden");
+                    })
+                    .catch(() => {
+                        recentList.innerHTML = `<li class="text-red-600">Error fetching calendar data.</li>`;
+                        const viewAllLink = document.getElementById("view-all-link");
+                        if (viewAllLink) viewAllLink.style.display = "none";
                     });
             },
-
             onDayCreate: function (dObj, dStr, fp, dayElem) {
                 const d = dayElem.dateObj;
                 const year = d.getFullYear();
@@ -376,9 +338,32 @@
             }
         });
 
-        // Reset view handlers, etc. (your existing code here)
-    });
+        fetch("/calendar-dates/")
+            .then(res => res.json())
+            .then(data => {
+                markedDates = data.dates || [];
+                calendar.redraw();
+            });
 
+        // Clicking outside calendar resets "Recently Solved" to original
+        const calendarContainer = document.getElementById("calendar-container");
+        document.addEventListener("click", (e) => {
+            // If the click is on the "View All" link, do NOT reset
+            const viewAllLink = document.getElementById("view-all-link");
+            if (viewAllLink && viewAllLink.contains(e.target)) {
+                return; // Don't reset if clicking "View All"
+            }
+            if (!calendarContainer.contains(e.target)) {
+                calendar.setDate(todayStr, false); // Don't trigger onChange!
+                recentList.innerHTML = originalRecentHTML;
+                recentTitle.textContent = originalRecentTitle;
+                if (viewAllLink) {
+                    viewAllLink.style.display = "";
+                    viewAllLink.href = "/solved/"; // No date param, shows all
+                }
+            }
+        });
+    });
 </script>
 
 {% endblock %}

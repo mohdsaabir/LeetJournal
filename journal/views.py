@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.http import JsonResponse
 from datetime import date
 from django.utils.timezone import localdate
+from django.utils.dateparse import parse_date
 
 
 
@@ -168,11 +169,15 @@ def question_detail(request, pk):
 
 
 def all_solved_view(request):
+    user = User.objects.get(username='testuser')
+    date_str = request.GET.get('date')
+    questions_solved = UserProblem.objects.filter(user=user).order_by('-last_solved')
 
-    user= User.objects.get(username='testuser')
+   
+    if date_str:
+        # Filter by date (assuming last_solved is a DateTimeField)
+        questions_solved = questions_solved.filter(last_solved=parse_date(date_str))
 
-    questions_solved = UserProblem.objects.filter(user=user).order_by('-last_solved')  
-    print(questions_solved)
     return render(request, "all_solved.html", {"solved_problems": questions_solved})
 
 
@@ -248,12 +253,44 @@ def new_entry_view(request):
 
 
 
-from django.utils.timezone import localdate
-
-
 def calendar_dates(request):
     # Get distinct solved dates
     dates = UserProblem.objects.values_list('last_solved', flat=True).distinct()
     # Format dates to string 'YYYY-MM-DD'
     date_strings = [d.strftime('%Y-%m-%d') for d in dates if d]
     return JsonResponse({'dates': date_strings})
+
+
+
+def calendar_data(request):
+    """
+    Return JSON list of questions solved on the requested date.
+    Expects ?date=yyyy-mm-dd as GET param.
+    """
+    user = User.objects.get(username = 'testuser')
+    date_str = request.GET.get("date")
+    if not date_str:
+        return JsonResponse({"questions": []})
+
+    try:
+        # Parse date string
+        from datetime import datetime
+        selected_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+    except ValueError:
+        return JsonResponse({"questions": []})
+
+    # Query questions solved by the user on this date
+    user_questions = UserProblem.objects.filter(user=user, last_solved=selected_date).select_related('question')
+
+    questions_data = []
+    for uq in user_questions:
+        questions_data.append({
+            "id": uq.question.id,
+            "question_no": uq.question.question_no,
+            "title": uq.question.title,
+            "date": uq.last_solved.strftime("%Y-%m-%d"),
+        })
+
+   
+
+    return JsonResponse({"questions": questions_data})
