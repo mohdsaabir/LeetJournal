@@ -10,6 +10,7 @@ from django.http import JsonResponse
 from datetime import date
 from django.utils.timezone import localdate
 from django.utils.dateparse import parse_date
+from django.db.models import Q
 
 
 
@@ -294,3 +295,25 @@ def calendar_data(request):
    
 
     return JsonResponse({"questions": questions_data})
+
+
+
+
+
+
+def revision_question(request):
+
+    user=User.objects.get(username = 'testuser')
+
+    revision_ques = UserProblem.objects.filter(user=user, mark_for_revision=True).order_by('-last_solved')
+
+    print(revision_ques)
+
+    
+    
+    return render(request , "revised.html", {"revision_ques": revision_ques})
+
+
+
+
+

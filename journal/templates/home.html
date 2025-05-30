@@ -5,11 +5,11 @@
 
     <!-- Stats Section -->
     <div class="grid grid-cols-2 gap-6 mb-10 max-w-md mx-auto">
-        <div class="bg-white shadow rounded-xl p-6">
+        <div onClick="window.location.href='/solved/'" style="cursor:pointer;"  class="bg-white shadow rounded-xl p-6">
             <p class="text-xl font-bold text-green-600">{{ total_solved }}</p>
             <p class="text-gray-600">Solved Problems</p>
         </div>
-        <div class="bg-white shadow rounded-xl p-6">
+        <div onClick="window.location.href='/revision/'" style="cursor:pointer;" class="bg-white shadow rounded-xl p-6">
             <p class="text-xl font-bold text-yellow-500">{{ total_revision }}</p>
             <p class="text-gray-600">In Revision</p>
         </div>
@@ -28,7 +28,7 @@
     <form id="leetcode-form" class="max-w-lg mx-auto mb-10 flex">
         {% csrf_token %}
         <input type="url" id="leetcode-url" name="url" placeholder="Paste LeetCode URL to add new entry..." required
-            class="flex-grow border rounded-l-full px-6 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+            class="flex-grow border rounded-l-full px-6 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" autocomplete="off"/>
         <button type="submit"
             class="bg-gray-600 hover:bg-gray-900 text-white font-bold rounded-r-full px-6 transition-colors duration-300"
             aria-label="Add new entry">+</button>

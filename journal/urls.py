@@ -10,5 +10,8 @@ urlpatterns = [
     path("new/", views.new_entry_view, name="new_entry"),
     path('calendar-dates/', views.calendar_dates, name='calendar_dates'),
     path('calendar-data/', views.calendar_data, name='calendar_data'),
+    path('revision/' , views.revision_question , name='revision'),
+
+
 
 ]
