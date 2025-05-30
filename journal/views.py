@@ -171,15 +171,39 @@ def question_detail(request, pk):
 
 def all_solved_view(request):
     user = User.objects.get(username='testuser')
-    date_str = request.GET.get('date')
-    questions_solved = UserProblem.objects.filter(user=user).order_by('-last_solved')
+    q = request.GET.get("q", "")
+    difficulty = request.GET.get("difficulty", "")
+    tag = request.GET.get("tags", "")  # Only single tag since dropdown is not multiple
 
-   
-    if date_str:
-        # Filter by date (assuming last_solved is a DateTimeField)
-        questions_solved = questions_solved.filter(last_solved=parse_date(date_str))
+    solved_problems = UserProblem.objects.filter(user=user)
 
-    return render(request, "all_solved.html", {"solved_problems": questions_solved})
+    if q:
+        solved_problems = solved_problems.filter(
+            Q(question__title__icontains=q) | Q(question__question_no__icontains=q)
+        )
+
+    if difficulty:
+        solved_problems = solved_problems.filter(question__leetcode_difficulty=difficulty)
+
+    if tag:  # Only filter if tag is not empty
+        solved_problems = solved_problems.filter(question__tags=tag)
+
+    all_tags = Tag.objects.all()
+
+    context = {
+        "solved_problems": solved_problems,
+        "all_tags": all_tags,
+        "filter_q": q,
+        "filter_difficulty": difficulty,
+        "filter_tags": [int(tag)] if tag else [],
+        "filters_applied": bool(q or difficulty or tag),
+    }
+    if request.GET.get("ajax") == "1":
+        # Render only the list items for AJAX
+        return render(request, "solved_list.html", {"solved_problems": solved_problems})
+
+    return render(request, "all_solved.html", context)  # Replace with your actual template
+
 
 
 

@@ -1,0 +1,17 @@
+{% for q in solved_problems %}
+<li class="bg-white p-4 rounded-xl shadow hover:shadow-md transition">
+    <a href="{% url 'question_detail' q.id %}" class="text-blue-600 font-semibold text-lg hover:underline">
+        {{ q.question.question_no }} - {{ q.question.title }}
+    </a>
+    <div class="text-sm text-gray-500 mt-1">
+        Solved on {{ q.last_solved|date:"M d, Y" }} | Difficulty: {{ q.question.leetcode_difficulty }}
+    </div>
+    {% if q.mark_for_revision %}
+    <span class="inline-block mt-1 px-2 py-0.5 text-xs font-medium bg-yellow-100 text-yellow-700 rounded">
+        🕑 Marked for Revision
+    </span>
+    {% endif %}
+</li>
+{% empty %}
+<p class="text-center text-gray-500">No results found.</p>
+{% endfor %}

@@ -2,27 +2,97 @@
 {% block content %}
 <div class="max-w-4xl mx-auto mt-6">
     <h2 class="text-2xl font-bold text-center mb-6">📚 All Solved Questions</h2>
-    
-    {% if solved_problems %}
-        <ul class="space-y-4">
-            {% for q in solved_problems %}
-            <li class="bg-white p-4 rounded-xl shadow hover:shadow-md transition">
-                <a href="{% url 'question_detail' q.id %}" class="text-blue-600 font-semibold text-lg hover:underline">
-                    {{ q.question.question_no }} - {{ q.question.title }}
-                </a>
-                <div class="text-sm text-gray-500 mt-1">
-                    Solved on {{ q.last_solved|date:"M d, Y" }} | Difficulty: {{ q.question.leetcode_difficulty }}
-                </div>
-                {% if q.mark_for_revision %}
-                    <span class="inline-block mt-1 px-2 py-0.5 text-xs font-medium bg-yellow-100 text-yellow-700 rounded">
-                        🕑 Marked for Revision
-                    </span>
-                {% endif %}
-            </li>
-            {% endfor %}
-        </ul>
+    {% if filters_applied %}
+    <p class="text-center text-sm text-gray-600 mb-4">Showing filtered results</p>
     {% else %}
-        <p class="text-center text-gray-500">You haven’t solved any problems yet.</p>
+    <p class="text-center text-sm text-gray-500 mb-4">Showing all solved questions</p>
+    {% endif %}
+
+    <!-- Filter and Search Form -->
+    <div class="flex flex-wrap gap-4 items-center mb-6 justify-center">
+        <input type="text" name="q" id="live-search-bar" placeholder="Search by number or title"
+            class="border rounded p-2 flex-grow min-w-[180px]" value="{{ request.GET.q|default:'' }}"
+            autocomplete="off">
+
+        <select name="difficulty" id="difficulty-filter" class="border rounded p-2 min-w-[120px]">
+            <option value="">All Difficulties</option>
+            <option value="Easy" {% if request.GET.difficulty|default_if_none:'' == "Easy" %}selected{% endif %}>Easy</option>
+            <option value="Medium" {% if request.GET.difficulty|default_if_none:'' == "Medium" %}selected{% endif %}>Medium</option>
+            <option value="Hard" {% if request.GET.difficulty|default_if_none:'' == "Hard" %}selected{% endif %}>Hard</option>
+        </select>
+
+        <select name="tags" id="tag-filter" class="border rounded p-2 min-w-[150px]">
+            <option value="">All Tags</option>
+            {% for tag in all_tags %}
+            <option value="{{ tag.id }}" {% if tag.id in filter_tags %}selected{% endif %}>{{ tag.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Solved Questions Listing -->
+    {% if solved_problems %}
+    <ul class="space-y-4" id="solved-list">
+        {% for q in solved_problems %}
+        <li class="bg-white p-4 rounded-xl shadow hover:shadow-md transition">
+            <a href="{% url 'question_detail' q.id %}" class="text-blue-600 font-semibold text-lg hover:underline">
+                {{ q.question.question_no }} - {{ q.question.title }}
+            </a>
+            <div class="text-sm text-gray-500 mt-1">
+                Solved on {{ q.last_solved|date:"M d, Y" }} | Difficulty: {{ q.question.leetcode_difficulty }}
+            </div>
+            {% if q.mark_for_revision %}
+            <span class="inline-block mt-1 px-2 py-0.5 text-xs font-medium bg-yellow-100 text-yellow-700 rounded">
+                🕑 Marked for Revision
+            </span>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p class="text-center text-gray-500">You haven’t solved any problems yet.</p>
     {% endif %}
 </div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const searchBar = document.getElementById("live-search-bar");
+    const solvedList = document.getElementById("solved-list");
+    const difficultyFilter = document.getElementById("difficulty-filter");
+    const tagFilter = document.getElementById("tag-filter");
+
+    function fetchFiltered() {
+        const q = searchBar.value.trim();
+        const difficulty = difficultyFilter.value;
+        const tag = tagFilter.value;
+        const params = new URLSearchParams({
+            q: q,
+            difficulty: difficulty,
+            tags: tag,
+            ajax: 1
+        });
+        fetch(`/solved/?${params.toString()}`)
+            .then(res => res.text())
+            .then(html => {
+                solvedList.innerHTML = html;
+            });
+    }
+
+    // Live search
+    let timeout = null;
+    searchBar.addEventListener("input", function () {
+        clearTimeout(timeout);
+        timeout = setTimeout(fetchFiltered, 300);
+    });
+
+    // Live filter for difficulty and tag
+    difficultyFilter.addEventListener("change", fetchFiltered);
+    tagFilter.addEventListener("change", fetchFiltered);
+
+    // Prevent form submission on Enter key in search bar
+    searchBar.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Prevent form submission
+        }
+    });
+});
+</script>
 {% endblock %}
