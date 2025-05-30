@@ -34,25 +34,41 @@
             aria-label="Add new entry">+</button>
     </form>
 
-    <!-- Recently Solved -->
-    <div class="text-left max-w-2xl mx-auto">
-        <h3 class="text-2xl font-semibold mb-4">🕒 Recently Solved</h3>
-        <ul class="space-y-3">
-            {% for q in recent_questions %}
-            <li class="bg-white shadow rounded-xl p-4 hover:shadow-md transition">
-                <a href="{% url 'question_detail' q.id %}" class="font-semibold text-lg text-blue-600 hover:underline">
-                    {{ q.question.question_no }} - {{ q.question.title }}
-                </a>
-                <p class="text-sm text-gray-500">Solved on {{ q.last_solved|date:"M d, Y" }}</p>
-            </li>
-            {% empty %}
-            <li>No recent entries yet.</li>
-            {% endfor %}
-        </ul>
-        <div class="mt-4 text-right">
-            <a href="{% url 'all_solved' %}" class="text-indigo-600 hover:underline">View All →</a>
+    <!-- Calendar and Recently Solved Layout -->
+    <div class="flex flex-col lg:flex-row justify-center items-start gap-10">
+
+        <!-- 📅 Calendar Section -->
+        <div class="bg-[#fefae0] rounded-2xl shadow-lg p-6 w-80">
+            <input id="calendar" type="text" readonly
+                class="w-full cursor-pointer text-center text-gray-700 font-semibold" />
+            <button id="reset-view" class="text-sm text-indigo-600 hover:underline hidden mt-2">Show Recent
+                Entries</button>
+            <ul id="calendar-entries" class="space-y-3 hidden"></ul>
         </div>
+
+        <!-- 🕒 Recently Solved -->
+        <div class="text-left max-w-2xl w-full">
+            <h3 class="text-2xl font-semibold mb-4">🕒 Recently Solved</h3>
+            <ul id="recent-list" class="space-y-3">
+                {% for q in recent_questions %}
+                <li class="bg-white shadow rounded-xl p-4 hover:shadow-md transition">
+                    <a href="{% url 'question_detail' q.id %}"
+                        class="font-semibold text-lg text-blue-600 hover:underline">
+                        {{ q.question.question_no }} - {{ q.question.title }}
+                    </a>
+                    <p class="text-sm text-gray-500">Solved on {{ q.last_solved|date:"Y-m-d" }}</p>
+                </li>
+                {% empty %}
+                <li>No recent entries yet.</li>
+                {% endfor %}
+            </ul>
+            <div class="mt-4 text-right">
+                <a href="{% url 'all_solved' %}" class="text-indigo-600 hover:underline">View All →</a>
+            </div>
+        </div>
+
     </div>
+
 </div>
 
 <!-- JavaScript to handle form and alert -->
@@ -72,7 +88,123 @@
     .animated-alert {
         animation: slideFadeIn 0.3s ease-out;
     }
+
+    #calendar.flatpickr-input {
+        display: none !important;
+    }
+
+
+    .calendar-dot {
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        background-color: #22c55e;
+        /* Tailwind green-500 */
+        border-radius: 50%;
+        position: absolute;
+        bottom: 2px;
+        left: 50%;
+        transform: translateX(-50%);
+
+    }
+
+    .flatpickr-day {
+        position: relative;
+        /* To contain the dot */
+    }
+
+
+
+    /*styling clender*/
+
+
+    /* Calendar Base */
+    .flatpickr-calendar {
+        background: #fdf6e3;
+        /* Light parchment */
+        color: #5b4636;
+        font-family: 'Georgia', serif;
+        border: 1px solid #e7d9c1;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+
+
+    }
+
+    /* Day cells */
+    .flatpickr-day {
+        border-radius: 6px;
+        transition: background 0.2s;
+    }
+
+    .flatpickr-day {
+        font-family: 'Quicksand', sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        color: #2f2f2f;
+    }
+
+    .flatpickr-months .flatpickr-month,
+    .flatpickr-weekday {
+        font-family: 'Quicksand', sans-serif;
+        font-weight: 600;
+        margin-bottom: 3px;
+    }
+
+
+    .flatpickr-day:hover {
+        background: #f1e4cb;
+        /* Soft hover */
+        color: #3d2e23;
+    }
+
+    .flatpickr-day.selected,
+    .flatpickr-day.startRange,
+    .flatpickr-day.endRange {
+        background: #c8b088 !important;
+        /* Muted sand */
+        color: white;
+    }
+
+    /* Remove border and outline from selected day */
+    .flatpickr-day.selected {
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    .flatpickr-day:focus {
+        outline: none !important;
+    }
+
+
+    .flatpickr-day.today {
+        border: 1px dashed #a78b61;
+    }
+
+    /* Month navigation */
+    .flatpickr-months {
+        background-color: #f5ebd9;
+        color: #4a3b2a;
+    }
+
+    .flatpickr-monthDropdown-months,
+    .flatpickr-current-month input {
+        font-family: 'Georgia', serif;
+        font-weight: bold;
+    }
+
+    /* Arrows */
+    .flatpickr-prev-month,
+    .flatpickr-next-month {
+        color: #8d7c66;
+    }
+
+    .flatpickr-weekday {
+        color: #a58e72;
+        font-weight: bold;
+    }
 </style>
+
+
 
 <script>
     document.getElementById("leetcode-form").addEventListener("submit", async function (e) {
@@ -97,7 +229,6 @@
             const alert = document.createElement("div");
             alert.className =
                 "animated-alert bg-[#7a756b] text-white px-6 py-4 rounded-lg shadow-lg mb-4 flex items-start justify-between gap-4 max-w-md";
-
 
             alert.innerHTML = `
                 <div class="flex-1">
@@ -125,6 +256,129 @@
             window.location.href = data.redirect_url;
         }
     });
+</script>
+
+<!-- Flatpickr & Script -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Quicksand&display=swap" rel="stylesheet">
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const calendar = flatpickr("#calendar", {
+            inline: true,  // <-- Added inline: true to show expanded calendar
+            onChange: function (selectedDates, dateStr) {
+                fetch(`/calendar-data/?date=${dateStr}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        document.getElementById("recent-list").style.display = "none";
+                        const entries = document.getElementById("calendar-entries");
+                        entries.innerHTML = "";
+
+                        if (data.questions.length === 0) {
+                            entries.innerHTML = `<li class="text-gray-500">No entries for ${dateStr}</li>`;
+                        } else {
+                            data.questions.forEach(q => {
+                                const li = document.createElement("li");
+                                li.className = "bg-white shadow rounded-xl p-4 hover:shadow-md transition";
+                                li.innerHTML = `
+                                    <a href="/question/${q.id}/" class="font-semibold text-lg text-blue-600 hover:underline">
+                                        ${q.question_no} - ${q.title}
+                                    </a>
+                                    <p class="text-sm text-gray-500">Solved on ${q.date}</p>
+                                `;
+                                entries.appendChild(li);
+                            });
+                        }
+
+                        entries.classList.remove("hidden");
+                        document.getElementById("reset-view").classList.remove("hidden");
+                    });
+            }
+        });
+
+        // Click outside to reset view
+        document.addEventListener("click", (e) => {
+            if (!document.getElementById("calendar").contains(e.target)) {
+                document.getElementById("recent-list").style.display = "block";
+                document.getElementById("calendar-entries").classList.add("hidden");
+                document.getElementById("reset-view").classList.add("hidden");
+            }
+        });
+
+        // Manual reset button
+        document.getElementById("reset-view").addEventListener("click", () => {
+            document.getElementById("recent-list").style.display = "block";
+            document.getElementById("calendar-entries").classList.add("hidden");
+            document.getElementById("reset-view").classList.add("hidden");
+        });
+    });
+
+
+    document.addEventListener("DOMContentLoaded", () => {
+        let markedDates = [];
+
+        // Fetch dates with entries
+        fetch("/calendar-dates/")
+            .then(res => res.json())
+            .then(data => {
+                markedDates = data.dates || [];
+                calendar.redraw();  // to trigger day creation
+            });
+
+        const calendar = flatpickr("#calendar", {
+            inline: true,
+            onChange: function (selectedDates, dateStr) {
+                fetch(`/calendar-data/?date=${dateStr}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        document.getElementById("recent-list").style.display = "none";
+                        const entries = document.getElementById("calendar-entries");
+                        entries.innerHTML = "";
+
+                        if (data.questions.length === 0) {
+                            entries.innerHTML = `<li class="text-gray-500">No entries for ${dateStr}</li>`;
+                        } else {
+                            data.questions.forEach(q => {
+                                const li = document.createElement("li");
+                                li.className = "bg-white shadow rounded-xl p-4 hover:shadow-md transition";
+                                li.innerHTML = `
+                                <a href="/question/${q.id}/" class="font-semibold text-lg text-blue-600 hover:underline">
+                                    ${q.question_no} - ${q.title}
+                                </a>
+                                <p class="text-sm text-gray-500">Solved on ${q.date}</p>
+                            `;
+                                entries.appendChild(li);
+                            });
+                        }
+
+                        entries.classList.remove("hidden");
+                        document.getElementById("reset-view").classList.remove("hidden");
+                    });
+            },
+
+            onDayCreate: function (dObj, dStr, fp, dayElem) {
+                const d = dayElem.dateObj;
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                const dateISO = `${year}-${month}-${day}`;
+
+                if (markedDates.includes(dateISO)) {
+                    const dot = document.createElement("span");
+                    dot.className = "calendar-dot";
+                    dayElem.appendChild(dot);
+                }
+            }
+        });
+
+        // Reset view handlers, etc. (your existing code here)
+    });
+
 </script>
 
 {% endblock %}

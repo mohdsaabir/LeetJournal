@@ -8,6 +8,7 @@ from .models import Question, Tag, DIFFICULTY_CHOICES, UserProblem
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from datetime import date
+from django.utils.timezone import localdate
 
 
 
@@ -241,3 +242,18 @@ def new_entry_view(request):
         return JsonResponse({"status": "error", "message": "No URL provided"}, status=400)
 
     return render(request, "home.html", {"user": user})
+
+
+
+
+
+
+from django.utils.timezone import localdate
+
+
+def calendar_dates(request):
+    # Get distinct solved dates
+    dates = UserProblem.objects.values_list('last_solved', flat=True).distinct()
+    # Format dates to string 'YYYY-MM-DD'
+    date_strings = [d.strftime('%Y-%m-%d') for d in dates if d]
+    return JsonResponse({'dates': date_strings})
