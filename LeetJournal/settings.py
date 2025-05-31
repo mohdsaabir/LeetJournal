@@ -34,6 +34,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/'  # After successful login
+LOGOUT_REDIRECT_URL = '/accounts/login/'  # After logout redirect to login page
+
 
 # Application definition
 
@@ -45,6 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'journal',
+    'accounts',
 ]
 
 MIDDLEWARE = [

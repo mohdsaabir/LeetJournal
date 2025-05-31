@@ -17,6 +17,7 @@
 
     <!-- Search -->
     <form action="/search/" method="get" class="mb-10">
+        {% csrf_token %}
         <div class="relative w-full max-w-xl mx-auto">
             <input id='search-bar' type="text" name="q" placeholder="Search your journal..."
                 class="w-full max-w-lg border rounded-full px-6 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"

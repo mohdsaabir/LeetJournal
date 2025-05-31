@@ -11,7 +11,7 @@ from datetime import date
 from django.utils.timezone import localdate
 from django.utils.dateparse import parse_date
 from django.db.models import Q
-
+from django.contrib.auth.decorators import login_required
 
 
 def extract_slug(url):
@@ -114,17 +114,17 @@ def fetch_and_store_question(request):
 
 
 
-
+@login_required
 def home_view(request):
 
     # login not implemented so far so just a shortcut change when login is implemented
-    user=User.objects.get(username='testuser')
-
+    user = request.user
+    print("User authenticated?", request.user.is_authenticated)
     recent_questions = UserProblem.objects.filter(user=user).order_by('-last_solved')[:3]
 
     total_solved = UserProblem.objects.filter(user=user).count()
 
-    total_revision = UserProblem.objects.filter(mark_for_revision=True).count()  # or adjust accordingly
+    total_revision = UserProblem.objects.filter(user=user,mark_for_revision=True).count()  # or adjust accordingly
 
     return render(request, "home.html", {
         "recent_questions": recent_questions,
@@ -136,9 +136,9 @@ def home_view(request):
 
 
 
-
+@login_required
 def question_detail(request, pk):
-    user = User.objects.get(username='testuser')
+    user = request.user
     user_problem = get_object_or_404(UserProblem, pk=pk, user=user)
 
     if request.method == 'POST':
@@ -169,8 +169,9 @@ def question_detail(request, pk):
     })
 
 
+@login_required
 def all_solved_view(request):
-    user = User.objects.get(username='testuser')
+    user = request.user
     q = request.GET.get("q", "")
     difficulty = request.GET.get("difficulty", "")
     tag = request.GET.get("tags", "")  # Only single tag since dropdown is not multiple
@@ -187,6 +188,10 @@ def all_solved_view(request):
 
     if tag:  # Only filter if tag is not empty
         solved_problems = solved_problems.filter(question__tags=tag)
+
+    date_str = request.GET.get("date", "")
+    if date_str:
+        solved_problems = solved_problems.filter(last_solved=date_str)
 
     all_tags = Tag.objects.all()
 
@@ -206,9 +211,9 @@ def all_solved_view(request):
 
 
 
-
+@login_required
 def new_entry_view(request):
-    user = User.objects.get(username='testuser')
+    user = request.user
 
     if request.method == 'POST':
         url = request.POST.get('url', '').strip()
@@ -277,22 +282,23 @@ def new_entry_view(request):
 
 
 
-
+@login_required
 def calendar_dates(request):
+    user=request.user
     # Get distinct solved dates
-    dates = UserProblem.objects.values_list('last_solved', flat=True).distinct()
+    dates = UserProblem.objects.filter(user=user).values_list('last_solved', flat=True).distinct()
     # Format dates to string 'YYYY-MM-DD'
     date_strings = [d.strftime('%Y-%m-%d') for d in dates if d]
     return JsonResponse({'dates': date_strings})
 
 
-
+@login_required
 def calendar_data(request):
     """
     Return JSON list of questions solved on the requested date.
     Expects ?date=yyyy-mm-dd as GET param.
     """
-    user = User.objects.get(username = 'testuser')
+    user = request.user
     date_str = request.GET.get("date")
     if not date_str:
         return JsonResponse({"questions": []})
@@ -324,11 +330,9 @@ def calendar_data(request):
 
 
 
-
+@login_required
 def revision_question(request):
-
-    user=User.objects.get(username = 'testuser')
-
+    user=request.user
     revision_ques = UserProblem.objects.filter(user=user, mark_for_revision=True).order_by('-last_solved')
 
     print(revision_ques)
@@ -340,9 +344,9 @@ def revision_question(request):
 
 
 
-
+@login_required
 def live_search(request):
-    user = User.objects.get(username='testuser')  # Replace with actual user retrieval logic
+    user = request.user  # Replace with actual user retrieval logic
     query = request.GET.get("q", "").strip()
     if request.GET.get("ajax") == "1":
         if query:

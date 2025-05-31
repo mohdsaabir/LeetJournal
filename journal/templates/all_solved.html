@@ -59,6 +59,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const difficultyFilter = document.getElementById("difficulty-filter");
     const tagFilter = document.getElementById("tag-filter");
 
+    function getUrlParam(name) {
+        const url = new URL(window.location.href);
+        return url.searchParams.get(name) || "";
+    }
+    const currentDate = getUrlParam("date");
+
     function fetchFiltered() {
         const q = searchBar.value.trim();
         const difficulty = difficultyFilter.value;
@@ -69,6 +75,9 @@ document.addEventListener("DOMContentLoaded", function () {
             tags: tag,
             ajax: 1
         });
+        if (currentDate) {
+            params.append("date", currentDate);
+        }
         fetch(`/solved/?${params.toString()}`)
             .then(res => res.text())
             .then(html => {
