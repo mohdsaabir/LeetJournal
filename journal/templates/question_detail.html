@@ -2,122 +2,144 @@
 {% block title %} Question Detail | LeetJournal{% endblock %}
 {% block content %}
 
-<div class="max-w-4xl mx-auto bg-white shadow-md rounded-xl p-6">
-    <h1 class="text-2xl font-bold text-blue-600 mb-4">
-        {{ user_problem.question.question_no }} - {{ user_problem.question.title }}
+<div class="max-w-5xl mx-auto px-2 py-6">
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-blue-600 mb-2">
+      {{ user_problem.question.question_no }} - {{ user_problem.question.title }}
     </h1>
-    <p class="text-sm text-gray-500 mb-2">
-        Difficulty: <span class="font-semibold">{{ user_problem.question.leetcode_difficulty }}</span>
-    </p>
-    <a href="{{ user_problem.question.link }}" target="_blank" class="text-blue-500 underline mb-6 inline-block">
+    <div class="flex flex-wrap items-center gap-4 mb-2">
+        <span class="text-sm text-gray-500">
+          Difficulty:
+          <span class="font-semibold
+            {% if user_problem.question.leetcode_difficulty == 'Easy' %}text-green-600
+            {% elif user_problem.question.leetcode_difficulty == 'Medium' %}text-yellow-500
+            {% elif user_problem.question.leetcode_difficulty == 'Hard' %}text-red-600
+            {% else %}text-gray-700{% endif %}">
+            {{ user_problem.question.leetcode_difficulty }}
+          </span>
+        </span>
+      <a href="{{ user_problem.question.link }}" target="_blank" class="text-blue-500 hover:text-blue-400">
         View on LeetCode
-    </a>
+      </a>
+    </div>
+  </div>
 
-    <h2 class="text-lg font-semibold mt-6 mb-2">Problem Statement</h2>
-    <div class="prose max-w-none bg-gray-50 p-4 rounded" style="overflow-x: auto;">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Left: Problem Statement -->
+    <div>
+      <h2 class="text-lg font-semibold mb-2">Problem Statement</h2>
+      <div class="prose max-w-none bg-gray-50 p-4 rounded-xl shadow overflow-x-auto" style="word-break: break-word;">
+        <style>
+          .prose pre, .prose code {
+            white-space: pre-wrap;
+            word-break: break-word;
+          }
+          .prose table {
+            display: block;
+            overflow-x: auto;
+            max-width: 100%;
+          }
+          .prose img {
+            max-width: 100%;
+            height: auto;
+          }
+        </style>
         {{ user_problem.question.problem_statement_html|safe }}
+      </div>
     </div>
 
-    <form method="POST" enctype="multipart/form-data" class="mt-8 space-y-6" id="problem-form">
+    <!-- Right: User Inputs -->
+    <div>
+      <form method="POST" enctype="multipart/form-data" class="space-y-6" id="problem-form">
         {% csrf_token %}
 
-        <div>
-            <label class="block font-semibold mb-1">My Solution</label>
-            <textarea name="my_solution" rows="10"
-                class="w-full p-3 border rounded-md bg-gray-50">{{ user_problem.my_solution }}</textarea>
+        <div class="bg-white rounded-xl shadow p-4">
+          <label class="block font-semibold mb-1">My Solution</label>
+          <textarea name="my_solution" rows="7"
+            class="w-full p-3 border rounded-md bg-gray-50">{{ user_problem.my_solution }}</textarea>
         </div>
 
-        <div>
-            <label class="block font-semibold mb-1">Optimized Solution</label>
-            <textarea name="optimized_solution" rows="10"
-                class="w-full p-3 border rounded-md bg-gray-50">{{ user_problem.optimized_solution|default_if_none:'' }}</textarea>
+        <div class="bg-white rounded-xl shadow p-4">
+          <label class="block font-semibold mb-1">Optimized Solution</label>
+          <textarea name="optimized_solution" rows="7"
+            class="w-full p-3 border rounded-md bg-gray-50">{{ user_problem.optimized_solution|default_if_none:'' }}</textarea>
         </div>
 
-        <div>
-            <label class="block font-semibold mb-1">Notes</label>
-            <textarea name="note" rows="5"
-                class="w-full p-3 border rounded-md bg-gray-50">{{ user_problem.note }}</textarea>
+        <div class="bg-white rounded-xl shadow p-4">
+          <label class="block font-semibold mb-1">Notes</label>
+          <textarea name="note" rows="4"
+            class="w-full p-3 border rounded-md bg-gray-50">{{ user_problem.note }}</textarea>
         </div>
 
-        <!-- Note Image Handling -->
-        <div>
-            <label class="block font-semibold mb-1">Note Image</label>
-            <div id="image-preview-wrapper" class="mb-4">
-                {% if user_problem.note_image %}
-                    <div class="relative inline-block" id="current-image-wrapper">
-                        <button type="button" id="delete-image-btn"
-                            class="absolute top-1 right-1 text-red-600 hover:text-red-800 transition"
-                            title="Delete Image" aria-label="Delete Image"
-                            style="font-size: 1.5rem; line-height: 1; cursor: pointer;">
-                            ×
-                        </button>
+        <div class="bg-white rounded-xl shadow p-4">
+          <label class="block font-semibold mb-1">Note Image</label>
+          <div id="image-preview-wrapper" class="mb-4">
+            {% if user_problem.note_image %}
+              <div class="relative inline-block" id="current-image-wrapper">
+                <button type="button" id="delete-image-btn"
+                  class="absolute top-1 right-1 text-red-600 hover:text-red-800 transition"
+                  title="Delete Image" aria-label="Delete Image"
+                  style="font-size: 1.5rem; line-height: 1; cursor: pointer;">
+                  ×
+                </button>
+                <img id="note-image" src="{{ user_problem.note_image.url }}" alt="Note Image"
+                  class="w-64 rounded border mb-0 cursor-pointer" title="Click to zoom">
+              </div>
+            {% else %}
+              <p class="text-sm text-gray-500">No image uploaded yet.</p>
+            {% endif %}
 
-                        <img id="note-image" src="{{ user_problem.note_image.url }}" alt="Note Image"
-                            class="w-64 rounded border mb-0 cursor-pointer" title="Click to zoom">
-                    </div>
-                {% else %}
-                    <p class="text-sm text-gray-500">No image uploaded yet.</p>
-                {% endif %}
-
-                <div id="new-image-preview" class="hidden">
-                    <div class="relative inline-block">
-                        <button type="button" id="delete-new-image-btn"
-                            class="absolute top-1 right-1 text-red-600 hover:text-red-800 transition"
-                            title="Delete New Image" aria-label="Delete New Image"
-                            style="font-size: 1.5rem; line-height: 1; cursor: pointer;">
-                            ×
-                        </button>
-                        <p class="font-semibold mb-1">New Image Preview:</p>
-                        <img id="preview-img" src="#" alt="New Note Image Preview" class="w-64 rounded border mb-0 cursor-pointer">
-                    </div>
-                </div>
+            <div id="new-image-preview" class="hidden">
+              <div class="relative inline-block">
+                <button type="button" id="delete-new-image-btn"
+                  class="absolute top-1 right-1 text-red-600 hover:text-red-800 transition"
+                  title="Delete New Image" aria-label="Delete New Image"
+                  style="font-size: 1.5rem; line-height: 1; cursor: pointer;">
+                  ×
+                </button>
+                <p class="font-semibold mb-1">New Image Preview:</p>
+                <img id="preview-img" src="#" alt="New Note Image Preview" class="w-64 rounded border mb-0 cursor-pointer">
+              </div>
             </div>
-
-            <input type="file" name="note_image" accept="image/*" id="note-image-input"
-                class="block w-full text-sm text-gray-700 border border-gray-300 rounded-md cursor-pointer bg-gray-50 p-2">
+          </div>
+          <input type="file" name="note_image" id="note-image-input" accept="image/*"
+            class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
         </div>
 
-        
-
-        <!-- User Difficulty dropdown -->
-        <div>
+        <div class="bg-white rounded-xl shadow p-4 flex flex-col gap-4">
+          <div>
             <label class="block font-semibold mb-1">User Difficulty</label>
             <select name="user_difficulty" class="w-full p-3 border rounded-md bg-gray-50">
-                <option value="Easy" {% if user_problem.user_difficulty == "Easy" %}selected{% endif %}>Easy</option>
-                <option value="Medium" {% if user_problem.user_difficulty == "Medium" %}selected{% endif %}>Medium</option>
-                <option value="Hard" {% if user_problem.user_difficulty == "Hard" %}selected{% endif %}>Hard</option>
+              <option value="Easy" {% if user_problem.user_difficulty == "Easy" %}selected{% endif %}>Easy</option>
+              <option value="Medium" {% if user_problem.user_difficulty == "Medium" %}selected{% endif %}>Medium</option>
+              <option value="Hard" {% if user_problem.user_difficulty == "Hard" %}selected{% endif %}>Hard</option>
             </select>
-        </div>
-
-        <!-- Revision status and toggle -->
-        <div class="mt-4">
-            <div class="flex items-center space-x-2">
-                <input type="checkbox" id="revision" name="revision" value="True"
-                    {% if user_problem.mark_for_revision %}checked{% endif %}
-                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                <label for="revision" id="revision-label" class="font-semibold text-gray-800">
-                    To be Revised
-                </label>
-            </div>
+          </div>
+          <div class="flex items-center space-x-2">
+            <input type="checkbox" id="revision" name="revision" value="True"
+              {% if user_problem.mark_for_revision %}checked{% endif %}
+              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <label for="revision" id="revision-label" class="font-semibold text-gray-800">
+              To be Revised
+            </label>
+          </div>
         </div>
 
         <button type="submit"
-            class="bg-blue-600 text-white font-semibold px-6 py-2 rounded hover:bg-blue-700 transition">
-            Save Changes
+          class="w-full bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition text-lg mt-2">
+          Save Changes
         </button>
-
-       
-    </form>
-
+      </form>
     </div>
+  </div>
+</div>
 
-    <!-- Move the Zoom Modal here, outside the main content div -->
-    <div id="zoom-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden">
-        <div class="relative">
-            <button id="zoom-close" class="absolute top-2 right-2 text-white hover:text-gray-300 text-3xl font-bold focus:outline-none transition" title="Close">&times;</button>
-            <img id="zoomed-img" src="" alt="Zoomed Note Image" class="max-h-[80vh] max-w-[90vw] rounded shadow-lg border-4 border-white">
-        </div>
-    </div>
+<!-- Zoom Modal (place outside the main content div, at the end of the file) -->
+<div id="zoom-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden">
+  <div class="relative">
+    <button id="zoom-close" class="absolute top-2 right-2 text-white hover:text-gray-300 text-3xl font-bold focus:outline-none transition" title="Close">&times;</button>
+    <img id="zoomed-img" src="" alt="Zoomed Note Image" class="max-h-[80vh] max-w-[90vw] rounded shadow-lg border-4 border-white">
+  </div>
 </div>
 
 <script>
@@ -131,8 +153,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const currentImageWrapper = document.getElementById("current-image-wrapper");
     const imagePreviewWrapper = document.getElementById("image-preview-wrapper");
     const deleteNewImageBtn = document.getElementById("delete-new-image-btn");
-
-   
 
     if (deleteBtn) {
         deleteBtn.addEventListener("click", function () {
