@@ -23,24 +23,29 @@
             </button>
 
             <!-- Desktop Nav -->
-            <nav class="hidden md:flex space-x-4">
-                <a href="/" class="text-gray-700 hover:underline">Home</a>
-                <a href="/search/" class="text-gray-700 hover:underline">Search</a>
-                <button class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded ml-2">
-                <a href="{% url 'logout' %}">Logout</a>
-            </button>
+            <nav class="hidden md:flex space-x-4 items-center">
+                <a href="/" class="text-gray-700 hover:text-amber-700 transition-colors duration-200 ">Home</a>
+                <a href="/solved/" class="text-gray-700 hover:text-amber-700 transition-colors duration-200 ">Search</a>
+                <a href="{% url 'logout' %}" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded ml-2">
+                    Logout
+                </a>
             </nav>
         </div>
 
         <!-- Mobile Dropdown -->
         <div id="mobile-menu" class="md:hidden hidden mt-2 px-4">
-            <a href="/" class="block py-1 text-gray-700 hover:underline">Home</a>
-            <a href="/search/" class="block py-1 text-gray-700 hover:underline">Search</a>
+            <a href="/" class="block py-1 text-gray-700 hover:text-amber-700 transition-colors duration-200">Home</a>
+            <a href="/solved/" class="block py-1 text-gray-700 hover:text-amber-700 transition-colors duration-200">Search</a>
+            <a href="{% url 'logout' %}"
+                class="block mt-2 bg-amber-600 hover:bg-amber-700 text-white text-center px-4 py-2 rounded">
+                Logout
+            </a>
         </div>
 
-      
-            
-    
+
+
+
+
     </header>
 
     <!-- Main Content -->
@@ -61,6 +66,15 @@
         menuBtn.addEventListener('click', () => {
             mobileMenu.classList.toggle('hidden');
         });
+
+
+
+        document.querySelectorAll('#mobile-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+
     </script>
 </body>
 

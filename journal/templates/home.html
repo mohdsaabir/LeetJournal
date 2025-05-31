@@ -1,60 +1,54 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="text-center">
-    <h2 class="text-3xl font-semibold mb-6">Welcome Back to Your LeetJournal 👋</h2>
+<div class="max-w-5xl mx-auto px-2">
+    <!-- Greeting (full width) with extra top margin -->
+    <h2 class="text-3xl font-semibold mb-12 mt-8 text-center">Welcome Back to Your LeetJournal 👋</h2>
 
-    <!-- Stats Section -->
-    <div class="grid grid-cols-2 gap-6 mb-10 max-w-md mx-auto">
-        <div onClick="window.location.href='/solved/'" style="cursor:pointer;" class="bg-white shadow rounded-xl p-6">
-            <p class="text-xl font-bold text-green-600">{{ total_solved }}</p>
-            <p class="text-gray-600">Solved Problems</p>
+    <!-- Two columns: stats/search/url | calendar -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10 items-start">
+        <!-- Left: Stats, search, URL bar -->
+        <div>
+            <div class="flex justify-center mb-8">
+                <div class="grid grid-cols-2 gap-6 max-w-md">
+                    <div onClick="window.location.href='/solved/'" style="cursor:pointer;" class="bg-white shadow rounded-xl p-6">
+                        <p class="text-xl font-bold text-green-600">{{ total_solved }}</p>
+                        <p class="text-gray-600">Solved Problems</p>
+                    </div>
+                    <div onClick="window.location.href='/revision/'" style="cursor:pointer;" class="bg-white shadow rounded-xl p-6">
+                        <p class="text-xl font-bold text-yellow-500">{{ total_revision }}</p>
+                        <p class="text-gray-600">In Revision</p>
+                    </div>
+                </div>
+            </div>
+            <form action="/search/" method="get" class="mb-4 relative">
+                {% csrf_token %}
+                <input id='search-bar' type="text" name="q" placeholder="Search your journal..."
+                    class="w-full border rounded-full px-6 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                    autocomplete="off" />
+                <div id="search-results"
+     class="hidden absolute z-50 mt-2 w-full max-h-64 overflow-y-auto bg-white border border-gray-200 rounded-2xl shadow-lg left-0"></div>
+            </form>
+            <form id="leetcode-form" class="flex">
+                {% csrf_token %}
+                <input type="url" id="leetcode-url" name="url" placeholder="Paste LeetCode URL..." required
+                    class="flex-grow border rounded-l-full px-6 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                    autocomplete="off" />
+                <button type="submit"
+                    class="bg-gray-600 hover:bg-gray-900 text-white font-bold rounded-r-full px-6 transition-colors duration-300"
+                    aria-label="Add new entry">+</button>
+            </form>
         </div>
-        <div onClick="window.location.href='/revision/'" style="cursor:pointer;" class="bg-white shadow rounded-xl p-6">
-            <p class="text-xl font-bold text-yellow-500">{{ total_revision }}</p>
-            <p class="text-gray-600">In Revision</p>
-        </div>
-    </div>
-
-    <!-- Search -->
-    <form action="/search/" method="get" class="mb-10">
-        {% csrf_token %}
-        <div class="relative w-full max-w-xl mx-auto">
-            <input id='search-bar' type="text" name="q" placeholder="Search your journal..."
-                class="w-full max-w-lg border rounded-full px-6 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                autocomplete="off" />
-            <div id="search-results"
-                 class="hidden absolute z-50 mt-2 w-[90%] max-h-64 overflow-y-auto bg-white border border-gray-200 rounded-2xl shadow-lg left-1/2 transform -translate-x-1/2">
-                <!-- Search results appear here -->
+        <!-- Right: Calendar -->
+        <div class="flex justify-center w-full lg:w-auto">
+            <div class="bg-[#fefae0] rounded-2xl shadow-lg p-6 w-full max-w-xs sm:w-80" id="calendar-container">
+                <input id="calendar" type="text" readonly
+                    class="w-full cursor-pointer text-center text-gray-700 font-semibold" />
             </div>
         </div>
-</div>
-</form>
-
-<!-- Floating Alert Box -->
-<div id="alert-box" class="fixed top-5 right-5 z-50"></div>
-
-<!-- URL Form -->
-<form id="leetcode-form" class="max-w-lg mx-auto mb-10 flex">
-    {% csrf_token %}
-    <input type="url" id="leetcode-url" name="url" placeholder="Paste LeetCode URL to add new entry..." required
-        class="flex-grow border rounded-l-full px-6 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
-        autocomplete="off" />
-    <button type="submit"
-        class="bg-gray-600 hover:bg-gray-900 text-white font-bold rounded-r-full px-6 transition-colors duration-300"
-        aria-label="Add new entry">+</button>
-</form>
-
-<!-- Calendar and Recently Solved Layout -->
-<div class="flex flex-col lg:flex-row justify-center items-start gap-10">
-
-    <!-- 📅 Calendar Section -->
-    <div class="bg-[#fefae0] rounded-2xl shadow-lg p-6 w-80" id="calendar-container">
-        <input id="calendar" type="text" readonly
-            class="w-full cursor-pointer text-center text-gray-700 font-semibold" />
     </div>
 
-    <!-- 🕒 Recently Solved -->
-    <div class="text-left max-w-2xl w-full">
+    <!-- Recently Solved List (full width) -->
+    <div class="text-left max-w-2xl w-full mx-auto">
         <h3 class="text-2xl font-semibold mb-4" id="recent-title">🕒 Recently Solved</h3>
         <ul id="recent-list" class="space-y-3">
             {% for q in recent_questions %}
@@ -72,9 +66,6 @@
             <a href="{% url 'all_solved' %}" id="view-all-link" class="text-blue-600 hover:underline">View All →</a>
         </div>
     </div>
-
-</div>
-
 </div>
 
 
@@ -455,5 +446,6 @@
         }
     });
 </script>
+
 
 {% endblock %}
