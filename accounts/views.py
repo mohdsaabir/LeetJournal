@@ -29,6 +29,8 @@ def signup_view(request):
     return render(request, 'signup.html')  # GET request or errors
 
 def login_view(request):
+    if request.user.is_authenticated:
+        return redirect('home')
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
