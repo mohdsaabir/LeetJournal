@@ -375,6 +375,7 @@ def live_search(request):
                 "id": up.id,
                 "title": up.question.title,
                 "question_no": up.question.question_no,
+                "difficulty": up.question.leetcode_difficulty,  # Add this line
             } for up in user_problems]
 
             return JsonResponse({"results": results})

@@ -16,9 +16,12 @@
 
         <select name="difficulty" id="difficulty-filter" class="border rounded p-2 min-w-[120px]">
             <option value="">All Difficulties</option>
-            <option value="Easy" {% if request.GET.difficulty|default_if_none:'' == "Easy" %}selected{% endif %}>Easy</option>
-            <option value="Medium" {% if request.GET.difficulty|default_if_none:'' == "Medium" %}selected{% endif %}>Medium</option>
-            <option value="Hard" {% if request.GET.difficulty|default_if_none:'' == "Hard" %}selected{% endif %}>Hard</option>
+            <option value="Easy" {% if request.GET.difficulty|default_if_none:'' == 'Easy' %}selected{% endif %}>Easy
+            </option>
+            <option value="Medium" {% if request.GET.difficulty|default_if_none:'' == 'Medium' %}selected{% endif %}>
+                Medium</option>
+            <option value="Hard" {% if request.GET.difficulty|default_if_none:'' == 'Hard' %}selected{% endif %}>Hard
+            </option>
         </select>
 
         <select name="tags" id="tag-filter" class="border rounded p-2 min-w-[150px]">
@@ -38,10 +41,19 @@
                 {{ q.question.question_no }} - {{ q.question.title }}
             </a>
             <div class="text-sm text-gray-500 mt-1">
-                Solved on {{ q.last_solved|date:"M d, Y" }} | Difficulty: {{ q.question.leetcode_difficulty }}
+                Solved on {{ q.last_solved|date:"M d, Y" }} | Difficulty:
+                <span class="
+                    font-semibold
+                    {% if q.question.leetcode_difficulty == 'Easy' %}text-green-600
+                    {% elif q.question.leetcode_difficulty == 'Medium' %}text-yellow-500
+                    {% elif q.question.leetcode_difficulty == 'Hard' %}text-red-600
+                    {% else %}text-gray-700{% endif %}
+                ">
+                    {{ q.question.leetcode_difficulty }}
+                </span>
             </div>
             {% if q.mark_for_revision %}
-            <span class="inline-block mt-1 px-2 py-0.5 text-xs font-medium bg-yellow-100 text-yellow-700 rounded">
+            <span class=" inline-block mt-1 px-2 py-0.5 text-xs font-medium bg-yellow-100 text-yellow-700 rounded">
                 🕑 Marked for Revision
             </span>
             {% endif %}
@@ -53,55 +65,57 @@
     {% endif %}
 </div>
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const searchBar = document.getElementById("live-search-bar");
-    const solvedList = document.getElementById("solved-list");
-    const difficultyFilter = document.getElementById("difficulty-filter");
-    const tagFilter = document.getElementById("tag-filter");
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchBar = document.getElementById("live-search-bar");
+        const solvedList = document.getElementById("solved-list");
+        const difficultyFilter = document.getElementById("difficulty-filter");
+        const tagFilter = document.getElementById("tag-filter");
 
-    function getUrlParam(name) {
-        const url = new URL(window.location.href);
-        return url.searchParams.get(name) || "";
-    }
-    const currentDate = getUrlParam("date");
-
-    function fetchFiltered() {
-        const q = searchBar.value.trim();
-        const difficulty = difficultyFilter.value;
-        const tag = tagFilter.value;
-        const params = new URLSearchParams({
-            q: q,
-            difficulty: difficulty,
-            tags: tag,
-            ajax: 1
-        });
-        if (currentDate) {
-            params.append("date", currentDate);
+        function getUrlParam(name) {
+            const url = new URL(window.location.href);
+            return url.searchParams.get(name) || "";
         }
-        fetch(`/solved/?${params.toString()}`)
-            .then(res => res.text())
-            .then(html => {
-                solvedList.innerHTML = html;
+        const currentDate = getUrlParam("date");
+
+        function fetchFiltered() {
+            const q = searchBar.value.trim();
+            const difficulty = difficultyFilter.value;
+            const tag = tagFilter.value;
+            const params = new URLSearchParams({
+                q: q,
+                difficulty: difficulty,
+                tags: tag,
+                ajax: 1
             });
-    }
-
-    // Live search
-    let timeout = null;
-    searchBar.addEventListener("input", function () {
-        clearTimeout(timeout);
-        timeout = setTimeout(fetchFiltered, 300);
-    });
-
-    // Live filter for difficulty and tag
-    difficultyFilter.addEventListener("change", fetchFiltered);
-    tagFilter.addEventListener("change", fetchFiltered);
-
-    // Prevent form submission on Enter key in search bar
-    searchBar.addEventListener('keydown', function(event) {
-        if (event.key === 'Enter') {
-            event.preventDefault(); // Prevent form submission
+            if (currentDate) {
+                params.append("date", currentDate);
+            }
+            fetch(`/solved/?${params.toString()}`)
+                .then(res => res.text())
+                .then(html => {
+                    solvedList.innerHTML = html;
+                });
         }
+
+        // Live search
+        let timeout = null;
+        searchBar.addEventListener("input", function () {
+            clearTimeout(timeout);
+            timeout = setTimeout(fetchFiltered, 300);
+        });
+
+        // Live filter for difficulty and tag
+        difficultyFilter.addEventListener("change", fetchFiltered);
+        tagFilter.addEventListener("change", fetchFiltered);
+
+        // Prevent form submission on Enter key in search bar
+        searchBar.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent form submission
+            }
+        });
     });
-});
+
+    
 </script>
 {% endblock %}

@@ -4,8 +4,17 @@
         {{ q.question.question_no }} - {{ q.question.title }}
     </a>
     <div class="text-sm text-gray-500 mt-1">
-        Solved on {{ q.last_solved|date:"M d, Y" }} | Difficulty: {{ q.question.leetcode_difficulty }}
-    </div>
+                Solved on {{ q.last_solved|date:"M d, Y" }} | Difficulty:
+                <span class="
+                    font-semibold
+                    {% if q.question.leetcode_difficulty == 'Easy' %}text-green-600
+                    {% elif q.question.leetcode_difficulty == 'Medium' %}text-yellow-500
+                    {% elif q.question.leetcode_difficulty == 'Hard' %}text-red-600
+                    {% else %}text-gray-700{% endif %}
+                ">
+                    {{ q.question.leetcode_difficulty }}
+                </span>
+            </div>
     {% if q.mark_for_revision %}
     <span class="inline-block mt-1 px-2 py-0.5 text-xs font-medium bg-yellow-100 text-yellow-700 rounded">
         🕑 Marked for Revision
