@@ -13,18 +13,19 @@
     body, .font-smooth { font-family: 'Inter', system-ui, sans-serif; }
   </style>
 </head>
-<body class="bg-gradient-to-br from-[#fefae0] to-[#fdf6e3] text-[#222] font-smooth overflow-auto">
+<body class="bg-[#fffdf7] text-blue-900 font-smooth min-h-screen">
 
   <!-- Header -->
-  <header class="flex justify-between items-center p-4 sm:p-6 shadow-md bg-[#fdf6e3]">
-    <a href="/home/"><h1 class="text-xl sm:text-2xl font-bold text-gray-800 font-smooth">LeetJournal 📓</h1></a>
-    
+  <header class="flex justify-between items-center p-4 sm:p-6 shadow-md bg-[#fffdf7]">
+    <a href="/home/">
+      <h1 class="text-2xl font-bold text-indigo-700 tracking-tight">LeetJournal</h1>
+    </a>
   </header>
 
   <!-- Login Form -->
   <main class="flex items-center justify-center px-2 sm:px-4 py-8">
-    <div class="bg-[#fffaf3] sm:p-8 p-4 rounded-2xl shadow-lg w-full max-w-md border border-[#e7d9c1] my-8">
-      <h2 class="text-xl sm:text-2xl font-bold mb-6 text-center text-gray-800 font-smooth">Welcome Back 👋</h2>
+    <div class="bg-white sm:p-8 p-4 rounded-lg shadow-lg w-full max-w-md border border-[#ececec] my-8">
+      <h2 class="text-2xl font-bold mb-6 text-center text-blue-900">Welcome Back 👋</h2>
 
       {% if messages %}
         <ul class="mb-4">
@@ -38,14 +39,14 @@
         {% csrf_token %}
         <!-- Username -->
         <div>
-          <label for="username" class="block text-sm font-medium text-[#7a756b] mb-1">Username</label>
-          <input type="text" name="username" id="username" class="w-full border border-[#e7d9c1] px-4 py-2 rounded-lg bg-[#fdf6e3] focus:outline-none focus:ring-2 focus:ring-indigo-300" autocomplete='off' required >
+          <label for="username" class="block text-sm font-medium text-gray-600 mb-1">Username</label>
+          <input type="text" name="username" id="username" class="w-full border border-[#ececec] px-4 py-2 rounded-lg bg-[#fffdf7] focus:outline-none focus:ring-2 focus:ring-indigo-300" autocomplete='off' required >
         </div>
 
         <!-- Password -->
         <div>
-          <label for="password" class="block text-sm font-medium text-[#7a756b] mb-1">Password</label>
-          <input type="password" name="password" id="password" class="w-full border border-[#e7d9c1] px-4 py-2 rounded-lg bg-[#fdf6e3] focus:outline-none focus:ring-2 focus:ring-indigo-300" autocomplete='off' required>
+          <label for="password" class="block text-sm font-medium text-gray-600 mb-1">Password</label>
+          <input type="password" name="password" id="password" class="w-full border border-[#ececec] px-4 py-2 rounded-lg bg-[#fffdf7] focus:outline-none focus:ring-2 focus:ring-indigo-300" autocomplete='off' required>
         </div>
 
         <!-- Submit -->
@@ -56,19 +57,19 @@
         </div>
       </form>
 
-      <p class="text-sm text-center text-[#7a756b] mt-4">
+      <p class="text-sm text-center text-gray-600 mt-4">
         Don’t have an account?
         <a href="{% url 'signup' %}" class="text-indigo-600 hover:underline">Sign up</a>
       </p>
 
-      <p class="text-sm text-center text-[#7a756b] mt-4">
+      <p class="text-sm text-center text-gray-600 mt-4">
         <a href="{% url 'password_reset' %}" class="text-indigo-600 hover:underline">Forgot password?</a>
       </p>
     </div>
   </main>
 
   <!-- Footer -->
-  <footer class="text-center py-6 text-sm text-[#a58e72] mt-12">
+  <footer class="text-center py-6 text-sm text-blue-900/60 mt-12 bg-[#fffdf7]">
     &copy; 2025 LeetJournal
   </footer>
 

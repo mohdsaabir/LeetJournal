@@ -31,12 +31,11 @@
   </style>
 </head>
 
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen font-sans">
-
+<body class="bg-[#fffdf7] min-h-screen font-sans">
   <!-- Header -->
-  <header class="bg-white shadow sticky top-0 z-30">
+  <header class="bg-[#fffdf7] shadow sticky top-0 z-30">
     <div class="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
-      <h1 class="text-3xl font-extrabold text-blue-700 tracking-tight">LeetJournal</h1>
+      <h1 class="text-3xl font-bold text-indigo-700 tracking-tight">LeetJournal</h1>
       <!-- Hamburger Button (Mobile) -->
       <button id="nav-toggle" class="md:hidden text-blue-700 focus:outline-none" aria-label="Open Menu">
         <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -45,16 +44,15 @@
       </button>
       <!-- Nav Links -->
       <nav id="nav-menu" class="hidden md:flex space-x-4">
-        <a href="{% url 'login' %}" class="text-blue-700 font-semibold hover:underline">Login</a>
-        <a href="{% url 'signup' %}"
-          class="bg-blue-700 text-white px-5 py-2 rounded hover:bg-blue-800 font-semibold transition">Sign Up</a>
+        <a href="{% url 'login' %}" class="text-blue-700 font-semibold hover:underline px-5 py-2">Login</a>
+        <a href="{% url 'signup' %}" class="bg-indigo-600 text-white px-5 py-2 rounded hover:bg-indigo-700 font-semibold transition">Sign Up</a>
       </nav>
     </div>
     <!-- Mobile Nav Links -->
     <div id="mobile-menu" class="md:hidden hidden px-6 pb-4">
-      <a href="{% url 'login' %}" class="block text-blue-700 font-semibold py-2">Login</a>
+      <a href="{% url 'login' %}" class="block text-blue-700 font-semibold px-5 py-2">Login</a>
       <a href="{% url 'signup' %}"
-        class="block bg-blue-700 text-white px-5 py-2 rounded hover:bg-blue-800 font-semibold transition mt-2">Sign Up</a>
+        class="block bg-indigo-600 text-white px-5 py-2 rounded hover:bg-indigo-700 font-semibold transition mt-2">Sign Up</a>
     </div>
   </header>
   <script>
@@ -66,44 +64,67 @@
     });
   </script>
 
-  <!-- Hero Section with Carousel -->
+  <section class="text-center px-6 py-20 max-w-3xl mx-auto">
+    <h2 class="text-5xl font-bold mb-6 leading-tight text-indigo-700">
+      Your Personal LeetCode Journal
+    </h2>
+    <p class="text-lg text-black mb-8 font-normal">
+      Track solved problems, write detailed notes, and boost your DSA skills with calendar and tagging features.
+    </p>
+    <a href="{% url 'signup' %}"
+      class="inline-block bg-indigo-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-indigo-700 transition">
+      Get Started for Free
+    </a>
+  </section>
 
-  <section class="max-w-7xl mx-auto px-4 py-16 flex flex-col lg:flex-row items-center gap-4">
-    <!-- Carousel -->
-    <div class="w-full md:w-[655px] flex justify-center items-center">
-      <div class="w-full h-[220px] md:h-[450px]">
-        <div class="swiper rounded-lg shadow-2xl bg-[#fffdf7] w-full h-full relative">
-          <div class="swiper-wrapper h-full">
-            <div class="swiper-slide flex items-center justify-center h-full">
-              <img src="{% static 'C:\Users\MUHAMMED SABIR\Desktop\LeetJournal\static\images\Screenshot 2025-06-01 214213.png' %}" alt="Dashboard" class="w-full h-full object-contain max-w-full max-h-full" />
+  <!-- Hero Section with Carousel -->
+  <div class="bg-[#fffdf7]">
+    <section class="max-w-7xl mx-auto px-4 py-16 flex flex-col lg:flex-row items-center gap-4">
+      <!-- Carousel -->
+      <div class="w-full md:w-[655px] flex justify-center items-center">
+        <div class="w-full h-[220px] md:h-[450px]">
+          <div class="swiper rounded-lg shadow-2xl bg-[#fffdf7] w-full h-full relative">
+            <div class="swiper-wrapper h-full">
+              <div class="swiper-slide flex items-center justify-center h-full">
+                <img
+                  src="{% static 'images\Picsart_25-06-03_19-08-25-808.png' %}"
+                  alt="Dashboard" class="w-full h-full object-contain max-w-full max-h-full" />
+              </div>
+              <div class="swiper-slide flex items-center justify-center h-full">
+                <img
+                  src="{% static 'images\Picsart_25-06-03_19-25-42-119.png' %}"
+                  alt="Problem Detail" class="w-full h-full object-contain max-w-full max-h-full" />
+              </div>
+              <div class="swiper-slide flex items-center justify-center h-full">
+                <img
+                  src="{% static 'images\Picsart_25-06-03_19-23-25-477.png' %}"
+                  alt="Solved List" class="w-full h-full object-contain max-w-full max-h-full" />
+              </div>
             </div>
-            <div class="swiper-slide flex items-center justify-center h-full">
-              <img src="{% static 'C:\Users\MUHAMMED SABIR\Desktop\LeetJournal\static\images\Screenshot 2025-06-01 215621.png' %}" alt="Problem Detail" class="w-full h-full object-contain max-w-full max-h-full" />
-            </div>
-            <div class="swiper-slide flex items-center justify-center h-full">
-              <img src="{% static 'C:\Users\MUHAMMED SABIR\Desktop\LeetJournal\static\images\Screenshot 2025-06-01 215638.png' %}" alt="Solved List" class="w-full h-full object-contain max-w-full max-h-full" />
-            </div>
+            <div class="swiper-pagination custom-swiper-pagination"></div>
           </div>
-          <div class="swiper-pagination custom-swiper-pagination"></div>
         </div>
       </div>
-    </div>
-    <!-- Cards -->
-    <div id="feature-cards" class="w-full flex flex-col gap-6 items-center justify-center mt-8 lg:mt-0">
-      <div data-slide="0" class="feature-card border-l-8 border-blue-600 bg-transparent rounded-lg p-6 flex flex-col items-center transition w-full max-w-[655px] lg:w-[287px] h-auto lg:h-[136px] cursor-pointer">
-        <h4 class="font-bold text-lg mb-1 text-blue-900">Problem Boards</h4>
-        <p class="text-blue-900/80 text-center text-sm">Drag and drop your solved, in-progress, and to-review problems just like Trello cards.</p>
+      <!-- Cards -->
+      <div id="feature-cards" class="w-full flex flex-col gap-6 items-center justify-center mt-8 lg:mt-0">
+        <div data-slide="0"
+          class="feature-card border-l-8 border-blue-600 bg-transparent rounded-lg p-6 flex flex-col items-center justify-center transition w-full max-w-[655px] lg:w-[287px] h-auto lg:h-[136px] cursor-pointer">
+          <h4 class="font-semibold text-lg mb-1 text-blue-900">Skip the Copy-Paste Hassle</h4>
+          <p class="text-blue-900/80 text-center text-sm font-normal">Paste a LeetCode URL—LeetJournal auto-fetches the question details. Add your solution and notes seamlessly in one place.</p>
+        </div>
+        <div data-slide="1"
+          class="feature-card border-l-8 border-blue-600 bg-transparent rounded-lg p-6 flex flex-col items-center justify-center transition w-full max-w-[655px] lg:w-[287px] h-auto lg:h-[136px] cursor-pointer">
+          <h4 class="font-semibold text-lg mb-1 text-blue-900">Write Like It’s Your Journal</h4>
+          <p class="text-blue-900/80 text-center text-sm font-normal">Go beyond code—jot down strategies, mistakes, and insights in rich-text notes that feel more like reflection than revision.</p>
+        </div>
+        <div data-slide="2"
+          class="feature-card border-l-8 border-blue-600 bg-transparent rounded-lg p-6 flex flex-col items-center justify-center transition w-full max-w-[655px] lg:w-[287px] h-auto lg:h-[136px] cursor-pointer">
+          <h4 class="font-semibold text-lg mb-1 text-blue-900">Capture Your Daily Wins</h4>
+          <p class="text-blue-900/80 text-center text-sm font-normal">Reflect on your problem-solving journey with a beautiful calendar and stats that celebrate consistency, not just streaks.</p>
+        </div>
       </div>
-      <div data-slide="1" class="feature-card border-l-8 border-transparent bg-transparent rounded-lg p-6 flex flex-col items-center transition w-full max-w-[655px] lg:w-[287px] h-auto lg:h-[136px] cursor-pointer">
-        <h4 class="font-bold text-lg mb-1 text-blue-900">Notes & Tags</h4>
-        <p class="text-blue-900/80 text-center text-sm">Attach notes, tags, and difficulty levels to each problem for easy filtering and revision.</p>
-      </div>
-      <div data-slide="2" class="feature-card border-l-8 border-transparent bg-transparent rounded-lg p-6 flex flex-col items-center transition w-full max-w-[655px] lg:w-[287px] h-auto lg:h-[136px] cursor-pointer">
-        <h4 class="font-bold text-lg mb-1 text-blue-900">Calendar & Progress</h4>
-        <p class="text-blue-900/80 text-center text-sm">Visualize your coding streaks and progress with an interactive calendar and stats.</p>
-      </div>
-    </div>
-  </section>
+    </section>
+  </div>
 
   <script>
     // SwiperJS Init
@@ -145,8 +166,11 @@
   </script>
 
   <!-- Footer -->
-  <footer class="max-w-7xl mx-auto py-8 text-center text-blue-900/60 text-sm">
+  <footer class="max-w-7xl mx-auto py-8 text-center text-blue-900/60 text-sm bg-[#fffdf7]">
     &copy; 2025 LeetJournal. All rights reserved.
+    <p class="mt-1">
+    Reach me at <a href="mailto:sabircottage225@gmail.com" class="text-indigo-600 hover:underline">sabircottage225@gmail.com</a>
+  </p>
   </footer>
 </body>
 
