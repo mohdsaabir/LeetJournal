@@ -1,82 +1,153 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LeetJournal – Track Your LeetCode Journey</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LeetJournal – Organize Your LeetCode Journey</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- SwiperJS CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <style>
+    /* Add this in a <style> tag in your <head> or in your CSS file */
+    .active-card-shadow {
+      box-shadow: 6px 6px 18px 0 rgba(37, 99, 235, 0.15);
+    }
+
+    .custom-swiper-pagination {
+      position: absolute !important;
+      right: 1.5rem;
+      bottom: 1.5rem;
+      left: auto !important;
+      width: auto !important;
+      z-index: 10;
+    }
+
+    .swiper {
+      position: relative;
+    }
+  </style>
 </head>
-<body class="bg-white text-gray-800">
+
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen font-sans">
 
   <!-- Header -->
-  <header class="flex justify-between items-center p-6 shadow-md">
-    <h1 class="text-2xl font-bold text-indigo-600">LeetJournal</h1>
-    <nav class="space-x-4">
-      <a href="{% url 'login' %}" class="text-gray-600 hover:text-indigo-600">Login</a>
-      <a href="{% url 'signup' %}" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">Sign Up</a>
-    </nav>
+  <header class="bg-white shadow sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
+      <h1 class="text-3xl font-extrabold text-blue-700 tracking-tight">LeetJournal</h1>
+      <!-- Hamburger Button (Mobile) -->
+      <button id="nav-toggle" class="md:hidden text-blue-700 focus:outline-none" aria-label="Open Menu">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+      <!-- Nav Links -->
+      <nav id="nav-menu" class="hidden md:flex space-x-4">
+        <a href="{% url 'login' %}" class="text-blue-700 font-semibold hover:underline">Login</a>
+        <a href="{% url 'signup' %}"
+          class="bg-blue-700 text-white px-5 py-2 rounded hover:bg-blue-800 font-semibold transition">Sign Up</a>
+      </nav>
+    </div>
+    <!-- Mobile Nav Links -->
+    <div id="mobile-menu" class="md:hidden hidden px-6 pb-4">
+      <a href="{% url 'login' %}" class="block text-blue-700 font-semibold py-2">Login</a>
+      <a href="{% url 'signup' %}"
+        class="block bg-blue-700 text-white px-5 py-2 rounded hover:bg-blue-800 font-semibold transition mt-2">Sign Up</a>
+    </div>
   </header>
+  <script>
+    // Hamburger menu toggle
+    const navToggle = document.getElementById('nav-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    navToggle.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+  </script>
 
-  <!-- Hero -->
-  <section class="text-center py-20 px-6 bg-gradient-to-br from-indigo-50 to-white">
-    <h2 class="text-4xl font-extrabold mb-4 text-gray-900">Your Personal LeetCode Journal</h2>
-    <p class="text-lg text-gray-600 max-w-xl mx-auto mb-6">
-      Track your solved problems, write solution notes, and boost your DSA revision with a calendar view and tagging system.
-    </p>
-    <a href="{% url 'signup' %}" class="bg-indigo-600 text-white px-6 py-3 rounded-lg text-lg hover:bg-indigo-700">Get Started</a>
-  </section>
+  <!-- Hero Section with Carousel -->
 
-  <!-- Features -->
-  <section class="py-16 px-6 bg-white">
-    <div class="max-w-5xl mx-auto grid md:grid-cols-3 gap-10 text-center">
-      <div>
-        <div class="text-indigo-600 text-4xl mb-2">✅</div>
-        <h3 class="text-xl font-semibold mb-2">Problem Tracker</h3>
-        <p class="text-gray-600">Log your solved LeetCode problems and revisit them anytime.</p>
+  <section class="max-w-7xl mx-auto px-4 py-16 flex flex-col lg:flex-row items-center gap-4">
+    <!-- Carousel -->
+    <div class="w-full md:w-[655px] flex justify-center items-center">
+      <div class="w-full h-[220px] md:h-[450px]">
+        <div class="swiper rounded-lg shadow-2xl bg-white w-full h-full relative">
+          <div class="swiper-wrapper h-full">
+            <div class="swiper-slide flex items-center justify-center h-full">
+              <img src="{% static 'C:\Users\MUHAMMED SABIR\Desktop\LeetJournal\static\images\Screenshot 2025-06-01 214213.png' %}" alt="Dashboard" class="w-full h-full object-contain max-w-full max-h-full" />
+            </div>
+            <div class="swiper-slide flex items-center justify-center h-full">
+              <img src="{% static 'C:\Users\MUHAMMED SABIR\Desktop\LeetJournal\static\images\Screenshot 2025-06-01 215621.png' %}" alt="Problem Detail" class="w-full h-full object-contain max-w-full max-h-full" />
+            </div>
+            <div class="swiper-slide flex items-center justify-center h-full">
+              <img src="{% static 'C:\Users\MUHAMMED SABIR\Desktop\LeetJournal\static\images\Screenshot 2025-06-01 215638.png' %}" alt="Solved List" class="w-full h-full object-contain max-w-full max-h-full" />
+            </div>
+          </div>
+          <div class="swiper-pagination custom-swiper-pagination"></div>
+        </div>
       </div>
-      <div>
-        <div class="text-indigo-600 text-4xl mb-2">📅</div>
-        <h3 class="text-xl font-semibold mb-2">Calendar View</h3>
-        <p class="text-gray-600">Visualize your daily progress with an interactive calendar.</p>
+    </div>
+    <!-- Cards -->
+    <div id="feature-cards" class="w-full flex flex-col gap-6 items-center justify-center mt-8 lg:mt-0">
+      <div data-slide="0" class="feature-card border-l-8 border-blue-600 bg-transparent rounded-lg p-6 flex flex-col items-center transition w-full max-w-[655px] lg:w-[287px] h-auto lg:h-[136px] cursor-pointer">
+        <h4 class="font-bold text-lg mb-1 text-blue-900">Problem Boards</h4>
+        <p class="text-blue-900/80 text-center text-sm">Drag and drop your solved, in-progress, and to-review problems just like Trello cards.</p>
       </div>
-      <div>
-        <div class="text-indigo-600 text-4xl mb-2">🏷️</div>
-        <h3 class="text-xl font-semibold mb-2">Tag & Filter</h3>
-        <p class="text-gray-600">Use custom tags and filters to organize your learning journey.</p>
+      <div data-slide="1" class="feature-card border-l-8 border-transparent bg-transparent rounded-lg p-6 flex flex-col items-center transition w-full max-w-[655px] lg:w-[287px] h-auto lg:h-[136px] cursor-pointer">
+        <h4 class="font-bold text-lg mb-1 text-blue-900">Notes & Tags</h4>
+        <p class="text-blue-900/80 text-center text-sm">Attach notes, tags, and difficulty levels to each problem for easy filtering and revision.</p>
+      </div>
+      <div data-slide="2" class="feature-card border-l-8 border-transparent bg-transparent rounded-lg p-6 flex flex-col items-center transition w-full max-w-[655px] lg:w-[287px] h-auto lg:h-[136px] cursor-pointer">
+        <h4 class="font-bold text-lg mb-1 text-blue-900">Calendar & Progress</h4>
+        <p class="text-blue-900/80 text-center text-sm">Visualize your coding streaks and progress with an interactive calendar and stats.</p>
       </div>
     </div>
   </section>
 
-  <!-- Optional Screenshot/Demo Section -->
-  <section class="py-16 px-6 bg-indigo-50 text-center">
-    <h3 class="text-2xl font-bold mb-6">See it in Action</h3>
-    <div class="flex flex-col md:flex-row gap-8 justify-center items-center">
-      <div>
-        <div class="w-full max-w-xs md:w-96 md:h-60 mx-auto">
-          <img src="{% static 'C:/Users/MUHAMMED SABIR/Desktop/LeetJournal/static/images/Screenshot 2025-06-01 214213.png' %}" alt="Dashboard" class="shadow-lg rounded-lg w-full h-full object-cover" />
-        </div>
-        <p class="mt-2 text-gray-600 text-sm">Dashboard & Calendar</p>
-      </div>
-      <div>
-        <div class="w-full max-w-xs md:w-96 md:h-60 mx-auto">
-          <img src="{% static 'C:/Users/MUHAMMED SABIR/Desktop/LeetJournal/static/images/Screenshot 2025-06-01 215638.png' %}" alt="Problem Detail" class="shadow-lg rounded-lg w-full h-full object-cover" />
-        </div>
-        <p class="mt-2 text-gray-600 text-sm">Problem Detail & Notes</p>
-      </div>
-      <div>
-        <div class="w-full max-w-xs md:w-96 md:h-60 mx-auto">
-          <img src="{% static 'C:/Users/MUHAMMED SABIR/Desktop/LeetJournal/static/images/Screenshot 2025-06-01 215621.png' %}" alt="Solved List" class="shadow-lg rounded-lg w-full h-full object-cover" />
-        </div>
-        <p class="mt-2 text-gray-600 text-sm">Solved Problems & Filters</p>
-      </div>
-    </div>
-  </section>
+  <script>
+    // SwiperJS Init
+    const swiper = new Swiper('.swiper', {
+      loop: false,
+      pagination: { el: '.swiper-pagination', clickable: true },
+      navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+      slidesPerView: 1,
+      spaceBetween: 20,
+    });
+
+    // Feature card tab logic
+    const cards = document.querySelectorAll('.feature-card');
+    function activateCard(idx) {
+      cards.forEach((card, i) => {
+        if (i === idx) {
+          card.classList.remove('border-transparent');
+          card.classList.add('border-blue-600', 'active-card-shadow');
+        } else {
+          card.classList.remove('border-blue-600', 'active-card-shadow');
+          card.classList.add('border-transparent');
+        }
+      });
+    }
+    cards.forEach((card, idx) => {
+      card.addEventListener('click', () => {
+        activateCard(idx);
+        swiper.slideTo(idx);
+      });
+    });
+
+    // Sync card highlight with Swiper slide change (optional)
+    swiper.on('slideChange', () => {
+      activateCard(swiper.activeIndex);
+    });
+
+    // Set initial active card
+    activateCard(0);
+  </script>
 
   <!-- Footer -->
-  <footer class="text-center py-6 bg-gray-100 mt-10">
-    &copy; LeetJournal 2025
+  <footer class="max-w-7xl mx-auto py-8 text-center text-blue-900/60 text-sm">
+    &copy; 2025 LeetJournal. All rights reserved.
   </footer>
-
 </body>
+
 </html>
