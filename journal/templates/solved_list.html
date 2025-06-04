@@ -1,3 +1,5 @@
+{% load static %}
+
 {% for q in solved_problems %}
 <li class="bg-white p-4 rounded-xl shadow hover:shadow-md transition">
     <a href="{% url 'question_detail' q.id %}" class="text-blue-600 font-semibold text-lg hover:underline">
