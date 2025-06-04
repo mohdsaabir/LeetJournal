@@ -3,27 +3,36 @@
 {% block content %}
 <div class="max-w-4xl mx-auto mt-6">
     <h2 class="text-2xl font-bold text-center mb-6">📚 Revision Questions</h2>
-    
+
     {% if revision_ques %}
-        <ul class="space-y-4">
-            {% for q in revision_ques %}
-            <li class="bg-white p-4 rounded-xl shadow hover:shadow-md transition">
-                <a href="{% url 'question_detail' q.id %}" class="text-blue-600 font-semibold text-lg hover:underline">
-                    {{ q.question.question_no }} - {{ q.question.title }}
-                </a>
-                <div class="text-sm text-gray-500 mt-1">
-                    Solved on {{ q.last_solved|date:"M d, Y" }} | Difficulty: {{ q.question.leetcode_difficulty }}
-                </div>
-                {% if q.mark_for_revision %}
-                    <span class="inline-block mt-1 px-2 py-0.5 text-xs font-medium bg-yellow-100 text-yellow-700 rounded">
-                        🕑 Marked for Revision
-                    </span>
-                {% endif %}
-            </li>
-            {% endfor %}
-        </ul>
+    <ul class="space-y-4">
+        {% for q in revision_ques %}
+        <li class="bg-white p-4 rounded-xl shadow hover:shadow-md transition">
+            <a href="{% url 'question_detail' q.id %}" class="text-blue-600 font-semibold text-lg hover:underline">
+                {{ q.question.question_no }} - {{ q.question.title }}
+            </a>
+            <div class="text-sm text-gray-500 mt-1">
+                Solved on {{ q.last_solved|date:"M d, Y" }} | Difficulty:
+                <span class="
+                    font-semibold
+                    {% if q.question.leetcode_difficulty == 'Easy' %}text-green-600
+                    {% elif q.question.leetcode_difficulty == 'Medium' %}text-yellow-500
+                    {% elif q.question.leetcode_difficulty == 'Hard' %}text-red-600
+                    {% else %}text-gray-700{% endif %}
+                ">
+                    {{ q.question.leetcode_difficulty }}
+                </span>
+            </div>
+            {% if q.mark_for_revision %}
+            <span class="inline-block mt-1 px-2 py-0.5 text-xs font-medium bg-yellow-100 text-yellow-700 rounded">
+                🕑 Marked for Revision
+            </span>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
     {% else %}
-        <p class="text-center text-gray-500">You haven’t solved any problems yet.</p>
+    <p class="text-center text-gray-500">You haven’t solved any problems yet.</p>
     {% endif %}
 </div>
 {% endblock %}

@@ -12,6 +12,7 @@ from django.utils.timezone import localdate
 from django.utils.dateparse import parse_date
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 
 def extract_slug(url):
@@ -119,8 +120,8 @@ def home_view(request):
 
     # login not implemented so far so just a shortcut change when login is implemented
     user = request.user
-    print("User authenticated?", request.user.is_authenticated)
-    recent_questions = UserProblem.objects.filter(user=user).order_by('-last_solved')[:3]
+   
+    recent_questions = UserProblem.objects.filter(user=user).order_by('-last_solved','-created_at')[:3]
 
     total_solved = UserProblem.objects.filter(user=user).count()
 
@@ -131,7 +132,6 @@ def home_view(request):
         "total_solved": total_solved,
         "total_revision": total_revision,
     })
-
 
 
 
@@ -162,6 +162,7 @@ def question_detail(request, pk):
         user_problem.user_difficulty = request.POST.get('user_difficulty', '')
 
         user_problem.save()
+        messages.success(request, "Changes saved successfully!")
         return redirect('question_detail', pk=pk)  # redirect to same page to prevent resubmission
 
     return render(request, 'question_detail.html', {
@@ -176,7 +177,7 @@ def all_solved_view(request):
     difficulty = request.GET.get("difficulty", "")
     tag = request.GET.get("tags", "")  # Only single tag since dropdown is not multiple
 
-    solved_problems = UserProblem.objects.filter(user=user)
+    solved_problems = UserProblem.objects.filter(user=user).order_by('-last_solved', '-created_at')
 
     if q:
         solved_problems = solved_problems.filter(
@@ -210,10 +211,11 @@ def all_solved_view(request):
     return render(request, "all_solved.html", context)  # Replace with your actual template
 
 
-
+import time
 @login_required
 def new_entry_view(request):
     user = request.user
+    
 
     if request.method == 'POST':
         url = request.POST.get('url', '').strip()
@@ -239,7 +241,7 @@ def new_entry_view(request):
 
             question_no = int(qdata["questionFrontendId"])
             difficulty = qdata["difficulty"]
-
+            
             question, created = Question.objects.get_or_create(
                 question_no=question_no,
                 defaults={
@@ -249,6 +251,7 @@ def new_entry_view(request):
                     "problem_statement_html": qdata["content"],
                 },
             )
+        
             if not created:
                 question.title = qdata["title"]
                 question.leetcode_difficulty = difficulty
@@ -267,12 +270,15 @@ def new_entry_view(request):
                 question=question,
                 defaults={"last_solved": date.today(), "mark_for_revision": False}
             )
+            
 
             return JsonResponse({
                 "status": "success",
                 "message": "Question added successfully!",
                 "redirect_url": f"/question/{user_problem.pk}/"  # or use reverse()
             })
+        
+        
 
         return JsonResponse({"status": "error", "message": "No URL provided"}, status=400)
 
@@ -333,10 +339,9 @@ def calendar_data(request):
 @login_required
 def revision_question(request):
     user=request.user
-    revision_ques = UserProblem.objects.filter(user=user, mark_for_revision=True).order_by('-last_solved')
+    revision_ques = UserProblem.objects.filter(user=user, mark_for_revision=True).order_by('-last_solved','-created_at')
 
-    print(revision_ques)
-
+    
     
     
     return render(request , "revised.html", {"revision_ques": revision_ques})

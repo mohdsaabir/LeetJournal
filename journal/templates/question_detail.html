@@ -3,6 +3,22 @@
 {% block content %}
 
 <div class="max-w-5xl mx-auto px-2 py-6">
+  {% if messages %}
+    <div id="alert-message">
+      {% for message in messages %}
+        <div class="mb-4 px-4 py-3 rounded bg-green-100 text-green-800 font-semibold shadow">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+    <script>
+      setTimeout(function() {
+        var alert = document.getElementById('alert-message');
+        if (alert) alert.style.display = 'none';
+      }, 5000); // 5000ms = 5 seconds
+    </script>
+  {% endif %}
+
   <div class="mb-8">
     <h1 class="text-2xl font-bold text-blue-600 mb-2">
       {{ user_problem.question.question_no }} - {{ user_problem.question.title }}
@@ -55,19 +71,19 @@
 
         <div class="bg-white rounded-xl shadow p-4">
           <label class="block font-semibold mb-1">My Solution</label>
-          <textarea name="my_solution" rows="7"
+          <textarea name="my_solution" rows="7" spellcheck="false"
             class="w-full p-3 border rounded-md bg-gray-50">{{ user_problem.my_solution }}</textarea>
         </div>
 
         <div class="bg-white rounded-xl shadow p-4">
           <label class="block font-semibold mb-1">Optimized Solution</label>
-          <textarea name="optimized_solution" rows="7"
+          <textarea name="optimized_solution" rows="7" spellcheck="false"
             class="w-full p-3 border rounded-md bg-gray-50">{{ user_problem.optimized_solution|default_if_none:'' }}</textarea>
         </div>
 
         <div class="bg-white rounded-xl shadow p-4">
           <label class="block font-semibold mb-1">Notes</label>
-          <textarea name="note" rows="4"
+          <textarea name="note" rows="4" spellcheck="false"
             class="w-full p-3 border rounded-md bg-gray-50">{{ user_problem.note }}</textarea>
         </div>
 

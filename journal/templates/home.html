@@ -22,21 +22,40 @@
             </div>
             <form action="/search/" method="get" class="mb-4 relative">
                 {% csrf_token %}
-                <input id='search-bar' type="text" name="q" placeholder="Search your journal..."
-                    class="w-full border rounded-full px-6 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                    autocomplete="off" />
+                <div class="relative">
+                    <input id='search-bar' type="text" name="q" placeholder="Search your journal..."
+                        class="w-full border rounded-full px-6 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 pr-10"
+                        autocomplete="off" />
+                    <span id="search-spinner" class="hidden absolute inset-y-0 right-4 flex items-center">
+                        <svg class="animate-spin h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                        </svg>
+                    </span>
+                </div>
                 <div id="search-results"
      class="hidden absolute z-50 mt-2 w-full max-h-64 overflow-y-auto bg-white border border-gray-200 rounded-2xl shadow-lg left-0"></div>
             </form>
             <form id="leetcode-form" class="flex">
                 {% csrf_token %}
-                <input type="url" id="leetcode-url" name="url" placeholder="Paste LeetCode URL..." required
-                    class="flex-grow border rounded-l-full px-6 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                    autocomplete="off" />
-                <button type="submit"
-                    class="bg-gray-600 hover:bg-gray-900 text-white font-bold rounded-r-full px-6 transition-colors duration-300"
-                    aria-label="Add new entry">+</button>
+                <div class="relative flex w-full">
+                    <input type="url" id="leetcode-url" name="url" placeholder="Paste LeetCode URL..." required
+                        class="flex-grow border rounded-l-full px-6 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                        autocomplete="off" />
+                    <button type="submit"
+                        class="bg-gray-600 hover:bg-gray-900 text-white font-bold rounded-r-full px-6 transition-colors duration-300 relative"
+                        aria-label="Add new entry">
+                        <span id="url-btn-text">+</span>
+                        <span id="url-btn-spinner" class="hidden absolute inset-y-0 right-3 flex items-center">
+                            <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                            </svg>
+                        </span>
+                    </button>
+                </div>
             </form>
+            
         </div>
         <!-- Right: Calendar -->
         <div class="flex justify-center w-full lg:w-auto">
@@ -231,54 +250,74 @@
 
 <!-- JS for form submission (unchanged) -->
 <script>
-    document.getElementById("leetcode-form").addEventListener("submit", async function (e) {
-        e.preventDefault();
+const submitBtn = document.querySelector("#leetcode-form button[type='submit']");
+const urlBtnText = document.getElementById("url-btn-text");
+const urlBtnSpinner = document.getElementById("url-btn-spinner");
 
-        const url = document.getElementById("leetcode-url").value;
-        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+document.getElementById("leetcode-form").addEventListener("submit", async function (e) {
+    e.preventDefault();
 
-        const res = await fetch("{% url 'new_entry' %}", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-                "X-CSRFToken": csrfToken,
-            },
-            body: new URLSearchParams({ url }),
-        });
+    // Show spinner, hide +
+    urlBtnText.classList.add("hidden");
+    urlBtnSpinner.classList.remove("hidden");
+    submitBtn.disabled = true;
 
-        const data = await res.json();
-        const alertBox = document.getElementById("alert-box");
+    const url = document.getElementById("leetcode-url").value;
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const urlInput = document.getElementById("leetcode-url");
+    const loading = document.getElementById("url-loading");
 
-        if (data.status !== "success") {
-            const alert = document.createElement("div");
-            alert.className =
-                "animated-alert bg-[#7a756b] text-white px-6 py-4 rounded-lg shadow-lg mb-4 flex items-start justify-between gap-4 max-w-md";
+    // Show loading, disable input and button
+    
 
-            alert.innerHTML = `
-                <div class="flex-1">
-                    <p class="font-semibold">Error</p>
-                    <p>${data.message}</p>
-                </div>
-                <button class="text-white hover:text-gray-300 text-xl font-bold leading-none focus:outline-none">&times;</button>
-            `;
-
-            alert.querySelector("button").addEventListener("click", () => alert.remove());
-
-            alertBox.innerHTML = "";
-            alertBox.appendChild(alert);
-
-            document.getElementById("leetcode-url").value = "";
-            document.getElementById("leetcode-url").focus();
-
-            setTimeout(() => {
-                alert.style.transition = "opacity 0.4s ease";
-                alert.style.opacity = "0";
-                setTimeout(() => alert.remove(), 400);
-            }, 4000);
-        } else {
-            window.location.href = data.redirect_url;
-        }
+    const res = await fetch("{% url 'new_entry' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": csrfToken,
+        },
+        body: new URLSearchParams({ url }),
     });
+
+
+    const data = await res.json();
+    const alertBox = document.getElementById("alert-box");
+
+    if (data.status !== "success") {
+        const alert = document.createElement("div");
+        alert.className =
+            "animated-alert bg-[#7a756b] text-white px-6 py-4 rounded-lg shadow-lg mb-4 flex items-start justify-between gap-4 max-w-md";
+
+        alert.innerHTML = `
+            <div class="flex-1">
+                <p class="font-semibold">Error</p>
+                <p>${data.message}</p>
+            </div>
+            <button class="text-white hover:text-gray-300 text-xl font-bold leading-none focus:outline-none">&times;</button>
+        `;
+
+        alert.querySelector("button").addEventListener("click", () => alert.remove());
+
+        alertBox.innerHTML = "";
+        alertBox.appendChild(alert);
+
+        document.getElementById("leetcode-url").value = "";
+        document.getElementById("leetcode-url").focus();
+
+        setTimeout(() => {
+            alert.style.transition = "opacity 0.4s ease";
+            alert.style.opacity = "0";
+            setTimeout(() => alert.remove(), 400);
+        }, 4000);
+    } else {
+        window.location.href = data.redirect_url;
+    }
+
+    // After fetch completes (in .finally or after window.location):
+    urlBtnText.classList.remove("hidden");
+    urlBtnSpinner.classList.add("hidden");
+    submitBtn.disabled = false;
+});
 </script>
 
 <!-- Flatpickr & Fonts -->
@@ -393,24 +432,26 @@
     document.addEventListener("DOMContentLoaded", function () {
         const searchBar = document.getElementById("search-bar");
         const searchResults = document.getElementById("search-results");
+        const searchSpinner = document.getElementById("search-spinner");
         let timeout = null;
 
         searchBar.addEventListener("input", function () {
             const query = this.value.trim();
-
             clearTimeout(timeout);
+
             if (query.length === 0) {
                 searchResults.innerHTML = "";
                 searchResults.classList.add("hidden");
+                searchSpinner.classList.add("hidden");
                 return;
             }
 
+            searchSpinner.classList.remove("hidden");
             timeout = setTimeout(() => {
                 fetch(`/search/?q=${encodeURIComponent(query)}&ajax=1`)
                     .then(res => res.json())
                     .then(data => {
                         searchResults.innerHTML = "";
-
                         if (data.results.length === 0) {
                             searchResults.innerHTML = "<div class='px-4 py-2 text-gray-500'>No results found</div>";
                         } else {
@@ -424,8 +465,10 @@
                                 searchResults.appendChild(div);
                             });
                         }
-
                         searchResults.classList.remove("hidden");
+                    })
+                    .finally(() => {
+                        searchSpinner.classList.add("hidden");
                     });
             }, 300);
         });

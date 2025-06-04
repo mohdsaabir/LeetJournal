@@ -10,9 +10,18 @@
 
     <!-- Filter and Search Form -->
     <div class="flex flex-wrap gap-4 items-center mb-6 justify-center">
-        <input type="text" name="q" id="live-search-bar" placeholder="Search by number or title"
-            class="border rounded p-2 flex-grow min-w-[180px]" value="{{ request.GET.q|default:'' }}"
-            autocomplete="off">
+        <div class="relative flex-grow min-w-[180px]">
+            <input type="text" name="q" id="live-search-bar" placeholder="Search by number or title"
+                class="border rounded p-2 w-full pr-10" value="{{ request.GET.q|default:'' }}"
+                autocomplete="off">
+            <span id="search-loading" class="hidden absolute inset-y-0 right-2 flex items-center">
+                <svg class="animate-spin h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                </svg>
+            </span>
+        </div>
 
         <select name="difficulty" id="difficulty-filter" class="border rounded p-2 min-w-[120px]">
             <option value="">All Difficulties</option>
@@ -70,6 +79,7 @@
         const solvedList = document.getElementById("solved-list");
         const difficultyFilter = document.getElementById("difficulty-filter");
         const tagFilter = document.getElementById("tag-filter");
+        const searchLoading = document.getElementById("search-loading");
 
         function getUrlParam(name) {
             const url = new URL(window.location.href);
@@ -90,10 +100,16 @@
             if (currentDate) {
                 params.append("date", currentDate);
             }
+            // Show spinner
+            document.getElementById("search-loading").classList.remove("hidden");
             fetch(`/solved/?${params.toString()}`)
                 .then(res => res.text())
                 .then(html => {
                     solvedList.innerHTML = html;
+                })
+                .finally(() => {
+                    // Hide spinner
+                    document.getElementById("search-loading").classList.add("hidden");
                 });
         }
 
@@ -101,7 +117,10 @@
         let timeout = null;
         searchBar.addEventListener("input", function () {
             clearTimeout(timeout);
-            timeout = setTimeout(fetchFiltered, 300);
+            timeout = setTimeout(() => {
+                searchLoading.classList.remove("hidden");
+                fetchFiltered();
+            }, 300);
         });
 
         // Live filter for difficulty and tag
@@ -115,7 +134,5 @@
             }
         });
     });
-
-    
 </script>
 {% endblock %}

@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% block title %}Auth – LeetJournal{% endblock %}</title>
+  <title>{% block title %}Sign Up – LeetJournal{% endblock %}</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts: Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -13,17 +13,17 @@
     body, .font-smooth { font-family: 'Inter', system-ui, sans-serif; }
   </style>
 </head>
-<body class="bg-gradient-to-br from-[#fefae0] to-[#fdf6e3] text-[#222] font-smooth overflow-auto">
+<body class="bg-[#fffdf7] text-blue-900 font-smooth overflow-auto min-h-screen">
 
   <!-- Header -->
-  <header class="flex justify-between items-center p-4 sm:p-6 shadow-md bg-[#fdf6e3] relative z-10">
-    <a href="/home/"><h1 class="text-xl sm:text-2xl font-bold text-gray-800 font-smooth">LeetJournal 📓</h1></a>
+  <header class="flex justify-between items-center p-4 sm:p-6 shadow-md bg-[#fffdf7] relative z-10">
+    <a href="/home/"><h1 class="text-2xl font-bold text-indigo-700 font-smooth">LeetJournal</h1></a>
   </header>
 
   <!-- Auth Form -->
   <main class="flex items-center justify-center px-2 sm:px-4 py-8">
-    <div class="bg-[#fffaf3] sm:p-8 p-4 rounded-2xl shadow-lg w-full max-w-md border border-[#e7d9c1] my-8">
-      <h2 class="text-xl sm:text-2xl font-bold mb-6 text-center text-gray-800 font-smooth">{% block heading %}Welcome{% endblock %}</h2>
+    <div class="bg-white sm:p-8 p-4 rounded-lg shadow-lg w-full max-w-md border border-[#ececec] my-8">
+      <h2 class="text-2xl font-bold mb-6 text-center text-blue-900 font-smooth">{% block heading %}Create your account{% endblock %}</h2>
 
       {% if messages %}
         <ul class="mb-4">
@@ -35,22 +35,21 @@
 
       <form method="POST" class="space-y-4">
         {% csrf_token %}
-        <!-- Example fields for signup, adjust for login -->
         <div>
-          <label for="username" class="block text-sm font-medium text-[#7a756b] mb-1">Username</label>
-          <input type="text" name="username" id="username" class="w-full border border-[#e7d9c1] px-4 py-2 rounded-lg bg-[#fdf6e3] focus:outline-none focus:ring-2 focus:ring-indigo-300" autocomplete="off" required>
+          <label for="username" class="block text-sm font-medium text-gray-600 mb-1">Username</label>
+          <input type="text" name="username" id="username" class="w-full border border-[#ececec] px-4 py-2 rounded-lg bg-[#fffdf7] focus:outline-none focus:ring-2 focus:ring-indigo-300" autocomplete="off" required>
         </div>
         <div>
-          <label for="email" class="block text-sm font-medium text-[#7a756b] mb-1">Email</label>
-          <input type="email" name="email" id="email" class="w-full border border-[#e7d9c1] px-4 py-2 rounded-lg bg-[#fdf6e3] focus:outline-none focus:ring-2 focus:ring-indigo-300" autocomplete="off" required>
+          <label for="email" class="block text-sm font-medium text-gray-600 mb-1">Email</label>
+          <input type="email" name="email" id="email" class="w-full border border-[#ececec] px-4 py-2 rounded-lg bg-[#fffdf7] focus:outline-none focus:ring-2 focus:ring-indigo-300" autocomplete="off" required>
         </div>
         <div>
-          <label for="password1" class="block text-sm font-medium text-[#7a756b] mb-1">Password</label>
-          <input type="password" name="password1" id="password1" class="w-full border border-[#e7d9c1] px-4 py-2 rounded-lg bg-[#fdf6e3] focus:outline-none focus:ring-2 focus:ring-indigo-300" autocomplete="off" required>
+          <label for="password1" class="block text-sm font-medium text-gray-600 mb-1">Password</label>
+          <input type="password" name="password1" id="password1" class="w-full border border-[#ececec] px-4 py-2 rounded-lg bg-[#fffdf7] focus:outline-none focus:ring-2 focus:ring-indigo-300" autocomplete="off" required>
         </div>
         <div>
-          <label for="password2" class="block text-sm font-medium text-[#7a756b] mb-1">Confirm Password</label>
-          <input type="password" name="password2" id="password2" class="w-full border border-[#e7d9c1] px-4 py-2 rounded-lg bg-[#fdf6e3] focus:outline-none focus:ring-2 focus:ring-indigo-300" autocomplete="off" required>
+          <label for="password2" class="block text-sm font-medium text-gray-600 mb-1">Confirm Password</label>
+          <input type="password" name="password2" id="password2" class="w-full border border-[#ececec] px-4 py-2 rounded-lg bg-[#fffdf7] focus:outline-none focus:ring-2 focus:ring-indigo-300" autocomplete="off" required>
         </div>
         <div>
           <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition duration-200 font-semibold text-base sm:text-lg">
@@ -59,7 +58,7 @@
         </div>
       </form>
 
-      <p class="text-sm text-center text-[#7a756b] mt-4">
+      <p class="text-sm text-center text-gray-600 mt-4">
         Already have an account?
         <a href="{% url 'login' %}" class="text-indigo-600 hover:underline">Log in</a>
       </p>
@@ -67,7 +66,7 @@
   </main>
 
   <!-- Footer -->
-  <footer class="text-center py-6 text-sm text-[#a58e72] mt-12">
+  <footer class="text-center py-6 text-sm text-blue-900/60 mt-auto bg-[#fffdf7]">
     &copy; 2025 LeetJournal
   </footer>
 
