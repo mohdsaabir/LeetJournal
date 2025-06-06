@@ -51,7 +51,7 @@
 
 | Home Page | Question View | Search Based On Filter |
 |-----------|----------------|----------|
-| ![Home]"/assets/Screenshot 2025-06-03 182709.png" | ![View]"/assets/Screenshot 2025-06-01 215638.png" | ![Calendar]"/assets/Screenshot 2025-06-01 215621.png" |
+| ![Home](./assets/Screenshot 2025-06-03 182709.png) | ![View](./assets/Screenshot 2025-06-01 215638.png) | ![Calendar](./assets/Screenshot 2025-06-01 215621.png) |
 
 ---
 
